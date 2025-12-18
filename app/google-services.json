@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "757886253550",
+    "project_id": "ian-alumni-directory",
+    "storage_bucket": "ian-alumni-directory.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:757886253550:android:395493722b35a250d076ff",
+        "android_client_info": {
+          "package_name": "com.team.ian"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzzO69FnF-K230NQf6Y_jNr0uvSZZk6WU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
