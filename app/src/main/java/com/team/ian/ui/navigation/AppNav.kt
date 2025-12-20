@@ -34,34 +34,32 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
-import com.team.ian.ui.screens.profile.ProfileScreen
+import com.team.ian.ui.screens.pending.PendingScreen
+import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
-import com.team.ian.ui.screens.utils.FullScreenLoader
-import com.team.ian.ui.screens.utils.SnackbarController
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNav() {
     val navController = rememberNavController()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    val items = listOf(
-        DrawerItem("Home", Icons.Default.Home, Screen.Home),
-        DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
-    )
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // Listen for snackbar events
-    LaunchedEffect(Unit) {
-        SnackbarController.events.collect {
-            snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar(
-                message = it.msg,
-                duration = SnackbarDuration.Long
-            )
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Splash
+    ) {
+         composable<Screen.Splash> {
+            SplashScreen(navController)
+        }
+        composable<Screen.Home> {
+            HomeScreen(navController)
+        }
+        composable<Screen.Login> {
+            LoginScreen(navController)
+        }
+        composable<Screen.Register> {
+            RegisterScreen(navController)
+        }
+        composable <Screen.Pending>{
+            PendingScreen(navController)
         }
     }
 
