@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "757886253550",
+    "firebase_url": "https://ian-alumni-directory-default-rtdb.firebaseio.com",
     "project_id": "ian-alumni-directory",
     "storage_bucket": "ian-alumni-directory.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.team.ian"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "757886253550-8h6et1lchopr4bvjvbkm5r59d2inbdaj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team.ian",
+            "certificate_hash": "656a164d614fbb40bd1b5ba0a4f6081e1b50094f"
+          }
+        },
+        {
+          "client_id": "757886253550-bcafc6as2kbpfvcjcsn4m724uq043l60.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCzzO69FnF-K230NQf6Y_jNr0uvSZZk6WU"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "757886253550-bcafc6as2kbpfvcjcsn4m724uq043l60.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
