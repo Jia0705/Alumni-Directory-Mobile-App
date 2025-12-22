@@ -130,11 +130,8 @@ fun AppNav() {
                     }
                 }
             ) { innerPadding ->
-
                 Box(modifier = Modifier.padding(innerPadding)) {
-
                     FullScreenLoader()
-
                     NavHost(
                         navController = navController,
                         startDestination = Screen.Splash
@@ -157,6 +154,10 @@ fun AppNav() {
 
                         composable<Screen.Profile> {
                             ProfileScreen(navController)
+                        }
+
+                        composable<Screen.Register> {
+                            RegisterScreen(navController)
                         }
                     }
                 }
@@ -199,6 +200,10 @@ fun AppNav() {
 
                     composable<Screen.Profile> {
                         ProfileScreen(navController)
+                    }
+
+                    composable<Screen.Register> {
+                        RegisterScreen(navController)
                     }
                 }
             }
