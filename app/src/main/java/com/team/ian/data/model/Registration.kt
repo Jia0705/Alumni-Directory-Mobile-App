@@ -1,6 +1,7 @@
 package com.team.ian.data.model
 
-data class RegistrationData(
+data class Registration (
+		val id: String = "",
     val name: String = "",
     val email: String = "",
     val pass: String = "",
