@@ -5,7 +5,7 @@ data class Alumni(
 
     // Access control
     val status: String = "pending",   // pending | approved | rejected | inactive
-    val role: String = "none",         // none | alumni | admin
+    val role: Role = Role.ALUMNI,         // none | alumni | admin
 
     // Basic info
     val fullName: String = "",
@@ -32,3 +32,4 @@ data class Alumni(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )
+
