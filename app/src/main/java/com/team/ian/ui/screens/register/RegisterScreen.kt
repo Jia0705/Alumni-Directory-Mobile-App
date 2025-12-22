@@ -21,9 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.team.ian.data.model.RegistrationData
 import com.team.ian.data.model.ExtendedInfo
+import com.team.ian.ui.navigation.Screen
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(
+    navController: NavController
+) {
     var pageNumber by remember { mutableStateOf(0) }
     var registrationData by remember {
         mutableStateOf(RegistrationData())
@@ -64,7 +67,8 @@ fun RegisterScreen(navController: NavController) {
                 3 -> AdditionalInfo(
                     extendedInfo = extendedInfo,
                     onUpdateData = { extendedInfo = it },
-                    onBack = { pageNumber = 2 }
+                    onBack = { pageNumber = 2 },
+                    onRegister = { navController.navigate(Screen.Pending) }
                 )
             }
         }
@@ -238,7 +242,8 @@ fun LocationInfo(
 fun AdditionalInfo(
     extendedInfo: ExtendedInfo,
     onUpdateData: (ExtendedInfo) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onRegister: () -> Unit
 ) {
 //    Text("Past Job History")
 //    OutlinedTextField(
@@ -280,7 +285,7 @@ fun AdditionalInfo(
         }
     )
     Spacer(modifier = Modifier.height(16.dp))
-    Button(onClick = {}) {
+    Button(onClick = { onRegister() }) {
         Text("Register")
     }
     Button(onClick = {
