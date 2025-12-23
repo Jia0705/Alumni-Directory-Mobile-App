@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.Registration
 import com.team.ian.data.model.ExtendedInfo
+import com.team.ian.ui.navigation.Screen
 
 @Composable
 fun RegisterScreen(navController: NavController) {

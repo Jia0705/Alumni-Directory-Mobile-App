@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun PendingScreen(navController: NavController) {
+fun PendingScreen(
+    navController: NavController
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

@@ -32,8 +32,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.team.ian.service.AuthService
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
+import com.team.ian.ui.screens.pending.PendingScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
 import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
@@ -47,6 +49,7 @@ fun AppNav() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val authService = remember { AuthService() }
 
     val items = listOf(
         DrawerItem("Home", Icons.Default.Home, Screen.Home),
@@ -139,7 +142,10 @@ fun AppNav() {
                         }
 
                         composable<Screen.Login> {
-                            LoginScreen(navController)
+                            LoginScreen(
+                                navController = navController,
+                                authService = authService
+                            )
                         }
 
                         composable<Screen.Home> {
@@ -174,7 +180,18 @@ fun AppNav() {
                     }
 
                     composable<Screen.Login> {
-                        LoginScreen(navController)
+                        LoginScreen(
+                            navController = navController,
+                            authService = authService
+                        )
+                    }
+
+                    composable<Screen.Register> {
+                        RegisterScreen(navController)
+                    }
+
+                    composable<Screen.Pending> {
+                        PendingScreen(navController)
                     }
 
                     composable<Screen.Home> {
