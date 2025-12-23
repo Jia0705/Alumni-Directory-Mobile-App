@@ -26,6 +26,9 @@ fun SplashScreen(
 		} else if (AuthService.getInstance().getCurrentUser()?.role == Role.NONE) {
 			Screen.Pending
 		} else if (AuthService.getInstance().getCurrentUser()?.role == Role.ADMIN) {
+			Screen.AdminDashboard
+		} else if (AuthService.getInstance().getCurrentUser() != null) {
+			Screen.Login
 		} else {
 			Screen.Login
 		}
