@@ -1,5 +1,6 @@
 package com.team.ian.data.repo
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -40,8 +41,16 @@ class RegistrationsRepoRealImpl : RegistrationsRepo {
 	}
 
 	override suspend fun register(registration: Registration) {
-		if (getRegistrationByEmail(registration.email) != null) {
+		if (getRegistrationByEmail(registration.email) == null) {
 			dbRef.push().setValue(registration).await()
+			Log.d("debugging", registration.toString())
+		}
+	}
+
+	override suspend fun getRegistrationById(id: String): Registration? {
+		val registration = dbRef.child(id).get().await()
+		return registration.key?.let {
+			registration.getValue(Registration::class.java)?.copy(it)
 		}
 	}
 }

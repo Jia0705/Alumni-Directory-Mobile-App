@@ -13,6 +13,7 @@ class RegisterViewModel(
 
     fun register(registration: Registration) {
         try {
+					Log.d("debugging", "registration on the backend")
             viewModelScope.launch {
                 repo.register(registration)
             }

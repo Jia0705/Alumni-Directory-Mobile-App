@@ -1,6 +1,5 @@
 package com.team.ian.ui.screens.admin
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,29 +15,36 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.team.ian.ui.navigation.Screen
 
 @Composable
 fun AdminDashboard(navController: NavController) {
-	val viewModel: AdminViewModel = viewModel()
+	val viewModel: AdminDashboardViewModel = viewModel()
 	val registrations = viewModel.registrations.collectAsStateWithLifecycle().value
-	Box(modifier = Modifier.fillMaxSize()) {
+	Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		LazyColumn(
 			verticalArrangement = Arrangement.spacedBy(16.dp),
 			contentPadding = PaddingValues(16.dp),
 			modifier = Modifier.fillMaxWidth()
 		) {
-			items(registrations){
+			items(registrations) {
 				Card(
 					elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier
-						.fillMaxWidth().clickable { Log.d("debugging", "this is a registration")}
+						.fillMaxWidth()
+						.clickable {
+							navController.navigate(Screen.AdminViewRegistration(it.id))
+						}
 				) {
 					Row(
-						modifier = Modifier.fillMaxSize().padding(16.dp)
+						modifier = Modifier
+							.fillMaxSize()
+							.padding(16.dp)
 					) {
 						Column(modifier = Modifier.fillMaxSize()) {
 							Text("${it.name}, ${it.email}")
@@ -46,6 +52,14 @@ fun AdminDashboard(navController: NavController) {
 					}
 				}
 			}
+		}
+	}
+	if (registrations.isEmpty()) {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center
+		) {
+			Text("No registrations")
 		}
 	}
 }

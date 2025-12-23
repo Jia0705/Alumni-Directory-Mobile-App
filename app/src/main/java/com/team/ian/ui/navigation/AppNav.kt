@@ -33,8 +33,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.admin.AdminDashboard
+import com.team.ian.ui.screens.admin.AdminViewRegistration
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
+import com.team.ian.ui.screens.pending.PendingScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
 import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
@@ -132,7 +134,7 @@ fun AppNav() {
 					FullScreenLoader()
 					NavHost(
 						navController = navController,
-						startDestination = Screen.Register
+						startDestination = Screen.Splash
 					) {
 
 						composable<Screen.Splash> {
@@ -155,8 +157,16 @@ fun AppNav() {
 							RegisterScreen(navController)
 						}
 
+						composable <Screen.Pending>{
+							PendingScreen(navController)
+						}
+
 						composable<Screen.AdminDashboard> {
 							AdminDashboard(navController)
+						}
+
+						composable<Screen.AdminViewRegistration> {
+							AdminViewRegistration(navController)
 						}
 					}
 				}
@@ -172,7 +182,7 @@ fun AppNav() {
 
 				NavHost(
 					navController = navController,
-					startDestination = Screen.Register
+					startDestination = Screen.Splash
 				) {
 					composable<Screen.Splash> {
 						SplashScreen(navController)
@@ -196,6 +206,14 @@ fun AppNav() {
 
 					composable<Screen.AdminDashboard> {
 						AdminDashboard(navController)
+					}
+
+					composable <Screen.Pending>{
+						PendingScreen(navController)
+					}
+
+					composable<Screen.AdminViewRegistration> {
+						AdminViewRegistration(navController)
 					}
 				}
 			}

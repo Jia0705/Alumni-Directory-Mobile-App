@@ -1,8 +1,7 @@
 package com.team.ian.ui.screens.admin
 
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.Registration
@@ -12,11 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AdminViewModel(
-	private val registrationsRepo: RegistrationsRepo = RegistrationsRepo.getInstance()
+class AdminDashboardViewModel(
+	private val registrationsRepo: RegistrationsRepo = RegistrationsRepo.getInstance(),
 ): ViewModel() {
 	private val _registrations = MutableStateFlow(emptyList<Registration>())
 	val registrations = _registrations.asStateFlow()
+
+	init {
+		getAllRegistrations()
+	}
 
 	fun getAllRegistrations() {
 		viewModelScope.launch(Dispatchers.IO) {
@@ -29,4 +32,5 @@ class AdminViewModel(
 			}
 		}
 	}
+
 }

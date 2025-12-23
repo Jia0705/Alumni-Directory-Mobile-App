@@ -11,7 +11,6 @@ data class Registration (
     val curCompany: String = "",
     val techStack: String = "",
     val curCityandCountry: Pair<String, String> = Pair("",""),
-    val contactPref: String = "",
     val contactLinks: List<String> = listOf(""),
 )
 

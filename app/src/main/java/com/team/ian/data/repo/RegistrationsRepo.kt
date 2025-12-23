@@ -9,6 +9,8 @@ interface RegistrationsRepo{
     suspend fun getRegistrationByEmail(email: String): Registration?
     suspend fun register(registration: Registration)
 
+		suspend fun getRegistrationById(id:String): Registration?
+
     companion object {
         private var instance: RegistrationsRepo? = null
         fun getInstance(): RegistrationsRepo{

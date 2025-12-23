@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.register
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -230,6 +231,7 @@ fun LocationInfo(
     Button(onClick = {
         registration.copy(curCityandCountry = Pair(city, country))
         viewModel.register(registration)
+				Log.d("debugging","registration complete")
     }
     ) {
         Text("Register")
