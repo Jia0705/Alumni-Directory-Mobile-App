@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.admin.AdminDashboard
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
+import com.team.ian.ui.screens.pending.PendingScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
 import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
