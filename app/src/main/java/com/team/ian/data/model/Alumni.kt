@@ -4,8 +4,8 @@ data class Alumni(
     val uid: String = "",
 
     // Access control
-    val status: String = "pending",   // pending | approved | rejected | inactive
-    val role: Role = Role.ALUMNI,         // none | alumni | admin
+    val status: AccountStatus = AccountStatus.PENDING,   // pending | approved | rejected | inactive
+    val role: Role = Role.NONE,         // none | alumni | admin
 
     // Basic info
     val fullName: String = "",
@@ -33,3 +33,6 @@ data class Alumni(
     val updatedAt: Long = System.currentTimeMillis()
 )
 
+enum class AccountStatus {
+	PENDING, APPROVED, REJECTED, INACTIVE
+}

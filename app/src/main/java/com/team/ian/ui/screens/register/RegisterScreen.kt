@@ -1,14 +1,17 @@
 package com.team.ian.ui.screens.register
 
-import androidx.compose.foundation.layout.Arrangement
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -17,282 +20,181 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.Registration
-import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.ui.navigation.Screen
 
 @Composable
-fun RegisterScreen(navController: NavController) {
-    val viewModel: RegisterViewModel = viewModel()
-    var pageNumber by remember { mutableIntStateOf(0) }
-    var registration by remember {
-        mutableStateOf(Registration())
-    }
-    var extendedInfo by remember {
-        mutableStateOf(ExtendedInfo())
-    }
+fun RegisterScreen(
+	navController: NavController
+) {
+	val viewModel: RegisterViewModel = viewModel()
+	val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            when (pageNumber) {
-                0 -> BasicInfo(
-                    registration = registration,
-                    onUpdateData = { registration = it },
-                    onNext = { pageNumber = 1 }
-                )
+	var page by remember { mutableIntStateOf(0) }
+	var registration by remember { mutableStateOf(Registration()) }
+	var password by remember { mutableStateOf("") }
 
-                1 -> ProfessionalInfo(
-                    registration = registration,
-                    onUpdateData = { registration = it },
-                    onNext = { pageNumber = 2 },
-                    onBack = { pageNumber = 0 }
-                )
+	fun submitRegistration() {
+		viewModel.register(
+			registration = registration,
+			password = password,
+			onSuccess = {
+				navController.navigate(Screen.Pending) {
+					popUpTo(Screen.Login) { inclusive = true }
+				}
+			},
+			onError = {
+				Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+			}
+		)
+	}
 
-                2 -> LocationInfo(
-                    registration = registration,
-//                    onUpdateData = { registrationData = it },
-//                    onNext = { confirmRegistration() },
-                    viewModel = viewModel,
-                    onBack = { pageNumber = 1 }
-                )
+	Box(
+		modifier = Modifier.fillMaxSize(),
+		contentAlignment = Alignment.Center
+	) {
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(24.dp),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			when (page) {
+				0 -> BasicInfoPage(
+					registration = registration,
+					password = password,
+					onUpdate = { registration = it },
+					onPasswordChange = { password = it },
+					onNext = { page = 1 }
+				)
 
-//                3 -> AdditionalInfo(
-//                    extendedInfo = extendedInfo,
-//                    onUpdateData = { extendedInfo = it },
-//                    onBack = { pageNumber = 2 }
-//                )
+				1 -> ProfessionalInfoPage(
+					registration = registration,
+					onUpdate = { registration = it },
+					onNext = { page = 2 },
+					onBack = { page = 0 }
+				)
 
-            }
-        }
-    }
+				2 -> LocationInfoPage(
+					registration = registration,
+					onUpdate = { registration = it },
+					onSubmit = { submitRegistration() },
+					onBack = { page = 1 }
+				)
+			}
+		}
+	}
 }
 
 @Composable
-fun BasicInfo(
-    registration: Registration,
-    onUpdateData: (Registration) -> Unit,
-    onNext: () -> Unit
+fun BasicInfoPage(
+	registration: Registration,
+	password: String,
+	onUpdate: (Registration) -> Unit,
+	onPasswordChange: (String) -> Unit,
+	onNext: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Full name")
-            OutlinedTextField(
-                value = registration.name,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(name = it)
-                    )
+	Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                }
-            )
-            Spacer(Modifier.padding(5.dp))
-            Text("Email address")
-            OutlinedTextField(
-                value = registration.email,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(email = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(5.dp))
-            Text("Password")
-            OutlinedTextField(
-                value = registration.pass,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(pass = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(5.dp))
-            Text("Graduation year")
-            OutlinedTextField(
-                value = registration.gradYear,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(gradYear = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(5.dp))
-            Text("Department/Major")
-            OutlinedTextField(
-                value = registration.major,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(major = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(16.dp))
-            Button(onClick = { onNext() }) {
-                Text("Next")
-            }
-        }
-    }
+		OutlinedTextField(
+			value = registration.name,
+			onValueChange = { onUpdate(registration.copy(name = it)) },
+			label = { Text("Full Name") }
+		)
+
+		OutlinedTextField(
+			value = registration.email,
+			onValueChange = { onUpdate(registration.copy(email = it)) },
+			label = { Text("Email") }
+		)
+
+		OutlinedTextField(
+			value = password,
+			onValueChange = onPasswordChange,
+			label = { Text("Password") },
+			visualTransformation = PasswordVisualTransformation()
+		)
+
+		OutlinedTextField(
+			value = registration.gradYear.toString(),
+			onValueChange = {
+				onUpdate(registration.copy(gradYear = it.toIntOrNull() ?: 0))
+			},
+			label = { Text("Graduation Year") }
+		)
+
+		OutlinedTextField(
+			value = registration.department,
+			onValueChange = { onUpdate(registration.copy(department = it)) },
+			label = { Text("Department / Major") }
+		)
+
+		Spacer(Modifier.height(16.dp))
+		Button(onClick = onNext) { Text("Next") }
+	}
 }
 
 @Composable
-fun ProfessionalInfo(
-    registration: Registration,
-    onUpdateData: (Registration) -> Unit,
-    onNext: () -> Unit,
-    onBack: () -> Unit
+fun ProfessionalInfoPage(
+	registration: Registration,
+	onUpdate: (Registration) -> Unit,
+	onNext: () -> Unit,
+	onBack: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(Modifier.padding(5.dp))
-            Text("Current job title/position")
-            OutlinedTextField(
-                value = registration.curPosition,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(curPosition = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(5.dp))
-            Text("Current company/organization")
-            OutlinedTextField(
-                value = registration.curCompany,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(curCompany = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(5.dp))
-            Text("Primary tech stack / domain")
-            OutlinedTextField(
-                value = registration.techStack,
-                onValueChange = {
-                    onUpdateData(
-                        registration.copy(techStack = it)
-                    )
-                }
-            )
-            Spacer(Modifier.padding(16.dp))
-            Button(onClick = { onNext() }) {
-                Text("Next")
-            }
-            Button(onClick = { onBack() }) {
-                Text("Back")
-            }
-        }
-    }
+	Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+		OutlinedTextField(
+			value = registration.position,
+			onValueChange = { onUpdate(registration.copy(position = it)) },
+			label = { Text("Current Position") }
+		)
+
+		OutlinedTextField(
+			value = registration.organization,
+			onValueChange = { onUpdate(registration.copy(organization = it)) },
+			label = { Text("Company / Organization") }
+		)
+
+		OutlinedTextField(
+			value = registration.techStack,
+			onValueChange = { onUpdate(registration.copy(techStack = it)) },
+			label = { Text("Primary Tech Stack") }
+		)
+
+		Spacer(Modifier.height(16.dp))
+		Button(onClick = onNext) { Text("Next") }
+		TextButton(onClick = onBack) { Text("Back") }
+	}
 }
 
 @Composable
-fun LocationInfo(
-    registration: Registration,
-    viewModel: RegisterViewModel,
-//    onUpdateData: (RegistrationData) -> Unit,
-//    onNext: () -> Unit,
-    onBack: () -> Unit
+fun LocationInfoPage(
+	registration: Registration,
+	onUpdate: (Registration) -> Unit,
+	onSubmit: () -> Unit,
+	onBack: () -> Unit
 ) {
-    var city by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("") }
+	Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-    Spacer(Modifier.padding(5.dp))
-    Text("Current city")
-    OutlinedTextField(
-        value = city,
-        onValueChange = { city = it }
-    )
-    Spacer(Modifier.padding(5.dp))
-    Text("Current country")
-    OutlinedTextField(
-        value = country,
-        onValueChange = { country = it }
-    )
-    Spacer(Modifier.padding(16.dp))
-    Button(onClick = {
-        registration.copy(curCityandCountry = Pair(city, country))
-        viewModel.register(registration)
-    }
-    ) {
-        Text("Register")
-    }
-    Button(onClick = { onBack() }) {
-        Text("Back")
-    }
+		OutlinedTextField(
+			value = registration.city,
+			onValueChange = { onUpdate(registration.copy(city = it)) },
+			label = { Text("City") }
+		)
+
+		OutlinedTextField(
+			value = registration.country,
+			onValueChange = { onUpdate(registration.copy(country = it)) },
+			label = { Text("Country") }
+		)
+
+		Spacer(Modifier.height(16.dp))
+		Button(onClick = onSubmit) { Text("Register") }
+		TextButton(onClick = onBack) { Text("Back") }
+	}
 }
-
-//@Composable
-//fun AdditionalInfo(
-//    extendedInfo: ExtendedInfo,
-//    onUpdateData: (ExtendedInfo) -> Unit,
-//    onBack: () -> Unit
-//) {
-//    Text("Past Job History")
-//    OutlinedTextField(
-//        value = extendedInfo.pastJobHistory,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(pastJobHistory = it)
-//            )
-//        }
-//    )
-//    Spacer(Modifier.padding(5.dp))
-//    Text("Skills")
-//    OutlinedTextField(
-//        value = extendedInfo.skills,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(skills = it)
-//            )
-//        }
-//    )
-//    Spacer(Modifier.padding(5.dp))
-//    Text("Short Bio")
-//    OutlinedTextField(
-//        value = extendedInfo.shortBio,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(shortBio = it)
-//            )
-//        }
-//    )
-//    Spacer(Modifier.padding(5.dp))
-//    Text("Profile Picture")
-//    OutlinedTextField(
-//        value = extendedInfo.profilePicUrl,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(profilePicUrl = it)
-//            )
-//        }
-//    )
-//    Spacer(modifier = Modifier.height(16.dp))
-//    Button(onClick = {}) {
-//        Text("Register")
-//    }
-//    Button(onClick = {
-//        onBack()
-//    }) {
-//        Text("Back")
-//    }
-//}
-

@@ -23,68 +23,67 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.team.ian.service.AuthService
 import com.team.ian.ui.navigation.Screen
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
-    navController: NavController
+	navController: NavController
 ) {
-    val context = LocalContext.current
-    val authService = AuthService.getInstance()
-    val user = authService.user.collectAsStateWithLifecycle().value
-    val scope = rememberCoroutineScope()
+	val context = LocalContext.current
+	val authService = AuthService.getInstance()
+	val user = authService.user.collectAsStateWithLifecycle().value
+	val scope = rememberCoroutineScope()
 
-    fun signIn() {
-        scope.launch(Dispatchers.IO) {
-            authService.signIn(context)
-        }
-    }
+	fun signOut() {
+		scope.launch {
+			authService.signOut()
+			navController.navigate(Screen.Login) {
+				popUpTo(Screen.Home) { inclusive = true }
+			}
+		}
+	}
 
-    fun signOut() {
-        navController.navigate(Screen.Login) {
-            popUpTo(Screen.Home) {
-                inclusive = true
-            }
-        }
-        scope.launch(Dispatchers.IO) {
-            authService.signOut()
-        }
-    }
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier.fillMaxSize()
+	) {
+		if (user == null) {
+			Text("No user logged in")
+		} else {
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        if (user == null) {
-            Button(
-                onClick = { signIn() }
-            ) {
-                Text("Sign-in with google")
-            }
-        } else {
-            Column(){
-                AsyncImage(
-                    model = ImageRequest
-                        .Builder(context)
-                        .data(user.photoURL)
-                        .build(),
-                    "",
-                    modifier = Modifier.fillMaxWidth(0.5f)
-                        .aspectRatio(1f)
-                        .clip(CircleShape)
-                )
+				if (user.photoURL.isNotBlank()) {
+					AsyncImage(
+						model = ImageRequest.Builder(context)
+							.data(user.photoURL)
+							.crossfade(true)
+							.build(),
+						contentDescription = "Profile photo",
+						modifier = Modifier
+							.fillMaxWidth(0.5f)
+							.aspectRatio(1f)
+							.clip(CircleShape)
+					)
 
-                Text(user.name)
-                Spacer(Modifier.height(20.dp))
-                Text(user.email)
-                Spacer(Modifier.height(20.dp))
-                Button(
-                    onClick = { signOut() }
-                ) {
-                    Text("Sign out")
-                }
-            }
-        }
-    }
+					Spacer(Modifier.height(16.dp))
+				}
+
+				Text(
+					text = user.name.ifBlank { "User" }
+				)
+
+				Spacer(Modifier.height(8.dp))
+
+				Text(user.email)
+
+				Spacer(Modifier.height(24.dp))
+
+				Button(onClick = { signOut() }) {
+					Text("Sign out")
+				}
+			}
+		}
+	}
 }
