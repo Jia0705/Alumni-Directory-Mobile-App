@@ -1,8 +1,8 @@
 package com.team.ian.data.model
 
 data class ExtendedInfo(
-    val pastJobHistory: List<String> = listOf(""),
-    val skills: List<String> = listOf(""),
+    val pastJobHistory: List<String> = emptyList(),
+    val skills: List<String> = emptyList(),
     val shortBio: String = "",
-    val profilePicUrl: String = ""
+    val profilePic: String = ""
 )

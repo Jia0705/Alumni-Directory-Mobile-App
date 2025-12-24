@@ -10,6 +10,7 @@ sealed class Screen {
     @Serializable object Login: Screen()
     @Serializable object Register: Screen()
     @Serializable object Pending: Screen()
+		@Serializable object Rejected: Screen()
 		@Serializable object AdminDashboard: Screen()
 		@Serializable data class AdminViewRegistration(val registrationId: String): Screen()
 }

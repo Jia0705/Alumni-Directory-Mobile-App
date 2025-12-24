@@ -1,7 +1,6 @@
 package com.team.ian.ui.navigation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -36,10 +35,11 @@ import com.team.ian.ui.screens.admin.AdminDashboard
 import com.team.ian.ui.screens.admin.AdminViewRegistration
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
-import com.team.ian.ui.screens.pending.PendingScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
 import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
+import com.team.ian.ui.screens.status.PendingScreen
+import com.team.ian.ui.screens.status.RejectedScreen
 import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
 import kotlinx.coroutines.launch
@@ -48,10 +48,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppNav() {
 	val navController = rememberNavController()
-	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+	val drawerState = rememberDrawerState(DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
 
-	val items = listOf(
+	val drawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
 		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
@@ -64,39 +64,34 @@ fun AppNav() {
 			snackbarHostState.currentSnackbarData?.dismiss()
 			snackbarHostState.showSnackbar(
 				message = it.msg,
+				actionLabel = null,
 				duration = SnackbarDuration.Long
 			)
 		}
 	}
 
-	val navBackStackEntry by navController.currentBackStackEntryAsState()
-	val currentRoute = navBackStackEntry?.destination?.route
+	val backStackEntry by navController.currentBackStackEntryAsState()
+	val currentRoute = backStackEntry?.destination?.route
 
-	// Screens where the top bar and drawer should NOT appear
-	val restrictedScreens = listOf(
+	val noScaffoldScreens = listOf(
+		Screen.Splash::class.qualifiedName,
 		Screen.Login::class.qualifiedName,
-		Screen.Splash::class.qualifiedName
+		Screen.Register::class.qualifiedName,
+		Screen.Pending::class.qualifiedName,
+		Screen.Rejected::class.qualifiedName
 	)
 
-	// Only show top bar on Home and Profile
-	val showTopbar =
-		currentRoute !in restrictedScreens &&
-				items.any { it.screen::class.qualifiedName == currentRoute }
+	val showScaffold =
+		currentRoute !in noScaffoldScreens &&
+				drawerItems.any { it.screen::class.qualifiedName == currentRoute }
 
-	// Close drawer when navigating to restricted screens
-	LaunchedEffect(currentRoute) {
-		if (currentRoute in restrictedScreens) {
-			drawerState.close()
-		}
-	}
-
-	if (showTopbar) {
-		ModalNavigationDrawer(
-			drawerState = drawerState,
-			gesturesEnabled = true,
-			drawerContent = {
+	ModalNavigationDrawer(
+		drawerState = drawerState,
+		gesturesEnabled = showScaffold,
+		drawerContent = {
+			if (showScaffold) {
 				ModalDrawerSheet {
-					items.forEach { item ->
+					drawerItems.forEach { item ->
 						NavigationDrawerItem(
 							label = { Text(item.title) },
 							selected = item.screen::class.qualifiedName == currentRoute,
@@ -111,85 +106,51 @@ fun AppNav() {
 					}
 				}
 			}
-		) {
-			Scaffold(
-				modifier = Modifier.fillMaxSize(),
-				snackbarHost = { SnackbarHost(snackbarHostState) },
-				topBar = {
-					if (showTopbar) {
-						CenterAlignedTopAppBar(
-							title = { Text("Ian²") },
-							navigationIcon = {
-								IconButton(
-									onClick = { scope.launch { drawerState.open() } }
-								) {
-									Icon(Icons.Default.Menu, null)
-								}
+		}
+	) {
+		Scaffold(
+			snackbarHost = { SnackbarHost(snackbarHostState) },
+			topBar = {
+				if (showScaffold) {
+					CenterAlignedTopAppBar(
+						title = { Text("Ian²") },
+						navigationIcon = {
+							IconButton(
+								onClick = { scope.launch { drawerState.open() } }
+							) {
+								Icon(Icons.Default.Menu, null)
 							}
-						)
-					}
-				}
-			) { innerPadding ->
-				Box(modifier = Modifier.padding(innerPadding)) {
-					FullScreenLoader()
-					NavHost(
-						navController = navController,
-						startDestination = Screen.Splash
-					) {
-
-						composable<Screen.Splash> {
-							SplashScreen(navController)
 						}
-
-						composable<Screen.Login> {
-							LoginScreen(navController)
-						}
-
-						composable<Screen.Home> {
-							HomeScreen(navController)
-						}
-
-						composable<Screen.Profile> {
-							ProfileScreen(navController)
-						}
-
-						composable<Screen.Register> {
-							RegisterScreen(navController)
-						}
-
-						composable <Screen.Pending>{
-							PendingScreen(navController)
-						}
-
-						composable<Screen.AdminDashboard> {
-							AdminDashboard(navController)
-						}
-
-						composable<Screen.AdminViewRegistration> {
-							AdminViewRegistration(navController)
-						}
-					}
+					)
 				}
 			}
-		}
-	} else {
-		Scaffold(
-			modifier = Modifier.fillMaxSize(),
-			snackbarHost = { SnackbarHost(snackbarHostState) }
-		) { innerPadding ->
-			Box(modifier = Modifier.padding(innerPadding)) {
+		) { padding ->
+			Box(Modifier.padding(padding)) {
 				FullScreenLoader()
 
 				NavHost(
 					navController = navController,
 					startDestination = Screen.Splash
 				) {
+
 					composable<Screen.Splash> {
 						SplashScreen(navController)
 					}
 
 					composable<Screen.Login> {
 						LoginScreen(navController)
+					}
+
+					composable<Screen.Register> {
+						RegisterScreen(navController)
+					}
+
+					composable<Screen.Pending> {
+						PendingScreen(navController)
+					}
+
+					composable<Screen.Rejected> {
+						RejectedScreen(navController)
 					}
 
 					composable<Screen.Home> {
@@ -200,16 +161,8 @@ fun AppNav() {
 						ProfileScreen(navController)
 					}
 
-					composable<Screen.Register> {
-						RegisterScreen(navController)
-					}
-
 					composable<Screen.AdminDashboard> {
 						AdminDashboard(navController)
-					}
-
-					composable <Screen.Pending>{
-						PendingScreen(navController)
 					}
 
 					composable<Screen.AdminViewRegistration> {

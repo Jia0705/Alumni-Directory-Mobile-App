@@ -1,24 +1,55 @@
 package com.team.ian.ui.screens.register
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.Registration
-import com.team.ian.data.repo.RegistrationsRepo
+import com.team.ian.data.repo.AlumniRepo
+import com.team.ian.service.AuthService
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-   private val repo: RegistrationsRepo = RegistrationsRepo.getInstance()
+	private val authService: AuthService = AuthService.getInstance(),
+	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance()
 ) : ViewModel() {
 
-    fun register(registration: Registration) {
-        try {
-					Log.d("debugging", "registration on the backend")
-            viewModelScope.launch {
-                repo.register(registration)
-            }
-        } catch (e: Exception) {
-            Log.d("debugging", e.toString())
-        }
-    }
+	fun register(
+		registration: Registration,
+		password: String,
+		onSuccess: () -> Unit,
+		onError: (String) -> Unit
+	) {
+		viewModelScope.launch {
+			try {
+				// Create Firebase Auth account
+				authService.registerWithEmail(
+					email = registration.email,
+					password = password
+				)
+
+				val user = authService.getCurrentUser()
+					?: throw IllegalStateException("Authentication failed")
+
+				// Convert Registration to Alumni
+				val alumni = Alumni(
+					uid = user.id,
+					fullName = registration.name,
+					email = registration.email,
+					graduationYear = registration.gradYear,
+					department = registration.department,
+					jobTitle = registration.position,
+					company = registration.organization,
+					primaryStack = registration.techStack,
+					city = registration.city,
+					country = registration.country
+				)
+
+				// Save alumni profile (status is PENDING and role is NONE)
+				alumniRepo.createAlumni(alumni)
+				onSuccess()
+			} catch (e: Exception) {
+				onError(e.message ?: "Registration failed")
+			}
+		}
+	}
 }
