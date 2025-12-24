@@ -12,3 +12,4 @@ data class Registration(
 	val country: String = "",
 	val contact: List<String> = emptyList()
 )
+

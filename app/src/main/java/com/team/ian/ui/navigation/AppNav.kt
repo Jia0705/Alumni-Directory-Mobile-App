@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.admin.AdminDashboard
+import com.team.ian.ui.screens.admin.AdminViewRegistration
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
@@ -57,6 +58,7 @@ fun AppNav() {
 
 	val snackbarHostState = remember { SnackbarHostState() }
 
+	// Listen for snackbar events
 	LaunchedEffect(Unit) {
 		SnackbarController.events.collect {
 			snackbarHostState.currentSnackbarData?.dismiss()
@@ -161,6 +163,10 @@ fun AppNav() {
 
 					composable<Screen.AdminDashboard> {
 						AdminDashboard(navController)
+					}
+
+					composable<Screen.AdminViewRegistration> {
+						AdminViewRegistration(navController)
 					}
 				}
 			}

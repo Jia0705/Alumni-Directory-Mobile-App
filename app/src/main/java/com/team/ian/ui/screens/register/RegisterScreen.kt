@@ -1,5 +1,7 @@
 package com.team.ian.ui.screens.register
 
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -198,3 +200,60 @@ fun LocationInfoPage(
 		TextButton(onClick = onBack) { Text("Back") }
 	}
 }
+
+//@Composable
+//fun AdditionalInfo(
+//    extendedInfo: ExtendedInfo,
+//    onUpdateData: (ExtendedInfo) -> Unit,
+//    onBack: () -> Unit
+//) {
+//    Text("Past Job History")
+//    OutlinedTextField(
+//        value = extendedInfo.pastJobHistory,
+//        onValueChange = {
+//            onUpdateData(
+//                extendedInfo.copy(pastJobHistory = it)
+//            )
+//        }
+//    )
+//    Spacer(Modifier.padding(5.dp))
+//    Text("Skills")
+//    OutlinedTextField(
+//        value = extendedInfo.skills,
+//        onValueChange = {
+//            onUpdateData(
+//                extendedInfo.copy(skills = it)
+//            )
+//        }
+//    )
+//    Spacer(Modifier.padding(5.dp))
+//    Text("Short Bio")
+//    OutlinedTextField(
+//        value = extendedInfo.shortBio,
+//        onValueChange = {
+//            onUpdateData(
+//                extendedInfo.copy(shortBio = it)
+//            )
+//        }
+//    )
+//    Spacer(Modifier.padding(5.dp))
+//    Text("Profile Picture")
+//    OutlinedTextField(
+//        value = extendedInfo.profilePicUrl,
+//        onValueChange = {
+//            onUpdateData(
+//                extendedInfo.copy(profilePicUrl = it)
+//            )
+//        }
+//    )
+//    Spacer(modifier = Modifier.height(16.dp))
+//    Button(onClick = {}) {
+//        Text("Register")
+//    }
+//    Button(onClick = {
+//        onBack()
+//    }) {
+//        Text("Back")
+//    }
+//}
+
