@@ -1,17 +1,14 @@
 package com.team.ian.data.model
 
-data class Registration (
-		val id: String = "",
-    val name: String = "",
-    val email: String = "",
-    val pass: String = "",
-    val gradYear: String = "",
-    val major: String = "",
-    val curPosition: String = "",
-    val curCompany: String = "",
-    val techStack: String = "",
-    val curCityandCountry: Pair<String, String> = Pair("",""),
-    val contactPref: String = "",
-    val contactLinks: List<String> = listOf(""),
+data class Registration(
+	val name: String = "",
+	val email: String = "",
+	val gradYear: Int = 0,
+	val department: String = "",
+	val position: String = "",
+	val organization: String = "",
+	val techStack: String = "",
+	val city: String = "",
+	val country: String = "",
+	val contact: List<String> = emptyList()
 )
-

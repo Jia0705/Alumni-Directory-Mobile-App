@@ -15,84 +15,98 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AuthService @Inject constructor() {
-    private val firebaseAuth = FirebaseAuth.getInstance()
-    private val _user = MutableStateFlow<User?>(null)
-    val user = _user.asStateFlow()
+class AuthService private constructor() {
+	private val firebaseAuth = FirebaseAuth.getInstance()
+	private val _user = MutableStateFlow<User?>(null)
+	val user = _user.asStateFlow()
 
-    init {
-        firebaseAuth.currentUser?.let { updateUser(it) }
-    }
+	init {
+		firebaseAuth.currentUser?.let { updateUser(it) }
+	}
 
-    private fun updateUser(firebaseUser: FirebaseUser) {
-        _user.update {
-            User(
-                id = firebaseUser.uid,
-                name = firebaseUser.displayName ?: "Unknown",
-                email = firebaseUser.email ?: "Unknown",
-                photoURL = firebaseUser.photoUrl?.toString() ?: ""
-            )
-        }
-    }
+	private fun updateUser(firebaseUser: FirebaseUser) {
+		_user.update {
+			User(
+				id = firebaseUser.uid,
+				name = firebaseUser.displayName ?: "Unknown",
+				email = firebaseUser.email ?: "",
+				photoURL = firebaseUser.photoUrl?.toString() ?: ""
+			)
+		}
+	}
 
-    suspend fun signIn(context: Context) {
-        try {
-            val token = getGoogleCredentialToken(context) ?: return
-            val credential = GoogleAuthProvider.getCredential(token, null)
-            val result = firebaseAuth.signInWithCredential(credential).await()
-            result.user?.let { updateUser(it) }
+	// Google Login
+	suspend fun signInWithGoogle(context: Context) {
+		try {
+			val token = getGoogleCredentialToken(context) ?: return
+			val credential = GoogleAuthProvider.getCredential(token, null)
+			val result = firebaseAuth.signInWithCredential(credential).await()
+			result.user?.let { updateUser(it) }
 
-        } catch (e: GetCredentialCancellationException) {
-            Log.d("AuthService", "Sign in cancelled", e)
-        } catch (e: GetCredentialException) {
-            Log.d("AuthService", "Google sign in failed", e)
-        } catch (e: Exception) {
-            Log.d("AuthService", "Sign in failed", e)
-        }
-    }
+		} catch (e: GetCredentialCancellationException) {
+			Log.d("AuthService", "Sign in cancelled", e)
+		} catch (e: GetCredentialException) {
+			Log.d("AuthService", "Google sign in failed", e)
+		} catch (e: Exception) {
+			Log.d("AuthService", "Sign in failed", e)
+		}
+	}
 
-    fun signOut() {
-        firebaseAuth.signOut()
-        _user.value = null
-    }
+	// Email Authentication
+	suspend fun registerWithEmail(email: String, password: String) {
+		firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+		firebaseAuth.currentUser?.let { updateUser(it) }
+	}
 
-    fun getCurrentUser(): User? = _user.value
+	suspend fun loginWithEmail(email: String, password: String) {
+		firebaseAuth.signInWithEmailAndPassword(email, password).await()
+		firebaseAuth.currentUser?.let { updateUser(it) }
+	}
 
-    private suspend fun getGoogleCredentialToken(context: Context): String? {
-        val credentialManager = CredentialManager.create(context)
+	// Sign out
+	fun signOut() {
+		firebaseAuth.signOut()
+		_user.value = null
+	}
 
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId("757886253550-bcafc6as2kbpfvcjcsn4m724uq043l60.apps.googleusercontent.com")
-            .build()
+	fun getCurrentUser(): User? = _user.value
 
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+	// Token
+	private suspend fun getGoogleCredentialToken(context: Context): String? {
+		val credentialManager = CredentialManager.create(context)
 
-        return try {
-            val result = credentialManager.getCredential(context, request)
-            result.credential.data.getString(
-                "com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN"
-            )
-        } catch (e: Exception) {
-            Log.d("AuthService", "Token failed", e)
-            null
-        }
-    }
+		val googleIdOption = GetGoogleIdOption.Builder()
+			.setFilterByAuthorizedAccounts(false)
+			.setServerClientId(GOOGLE_CLIENT_ID)
+			.build()
 
-    companion object {
-        private var instance: AuthService?= null
+		val request = GetCredentialRequest.Builder()
+			.addCredentialOption(googleIdOption)
+			.build()
 
-        fun getInstance(): AuthService {
-            if (instance == null) {
-                instance = AuthService()
-            }
-            return instance!!
-        }
-    }
+		return try {
+			val result = credentialManager.getCredential(context, request)
+			result.credential.data.getString(
+				"com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN"
+			)
+		} catch (e: Exception) {
+			Log.d("AuthService", "Token failed", e)
+			null
+		}
+	}
+
+	companion object {
+		private const val GOOGLE_CLIENT_ID =
+			"757886253550-bcafc6as2kbpfvcjcsn4m724uq043l60.apps.googleusercontent.com"
+
+		private var instance: AuthService? = null
+
+		fun getInstance(): AuthService {
+			if (instance == null) {
+				instance = AuthService()
+			}
+			return instance!!
+		}
+	}
 }

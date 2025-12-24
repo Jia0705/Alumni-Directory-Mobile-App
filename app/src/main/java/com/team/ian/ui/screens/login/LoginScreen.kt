@@ -28,115 +28,125 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.service.AuthService
 import com.team.ian.ui.navigation.Screen
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
-    authService: AuthService
+	navController: NavController,
+	viewModel: LoginViewModel = viewModel()
 ) {
-    val context = LocalContext.current
+	val context = LocalContext.current
 
-    var email by remember { mutableStateOf("") }
-    var pass by remember { mutableStateOf("") }
+	var email by remember { mutableStateOf("") }
+	var pass by remember { mutableStateOf("") }
 
-    fun showToast(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-    }
+	fun showToast(msg: String) {
+		Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+	}
 
-    LaunchedEffect(Unit) {
-        authService.user.collect { user ->
-            if (user != null) {
-                navController.navigate(Screen.Home) {
-                    popUpTo(Screen.Login) { inclusive = true }
-                }
-            }
-        }
-    }
+	//  Login success redirect to splash screen
+	LaunchedEffect(Unit) {
+		AuthService.getInstance().user.collect { user ->
+			if (user != null) {
+				navController.navigate(Screen.Splash) {
+					popUpTo(Screen.Login) { inclusive = true }
+				}
+			}
+		}
+	}
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+	Box(
+		modifier = Modifier.fillMaxSize(),
+		contentAlignment = Alignment.Center
+	) {
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(24.dp),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
 
-            Text(
-                text = "Welcome to Ian²",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+			Text(
+				text = "Welcome to Ian²",
+				fontSize = 24.sp,
+				fontWeight = FontWeight.Bold,
+				modifier = Modifier.fillMaxWidth(),
+				textAlign = TextAlign.Center
+			)
 
-            Spacer(Modifier.height(32.dp))
+			Spacer(Modifier.height(32.dp))
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            )
+			OutlinedTextField(
+				value = email,
+				onValueChange = { email = it },
+				label = { Text("Email") },
+				modifier = Modifier.fillMaxWidth(),
+				shape = RoundedCornerShape(12.dp)
+			)
 
-            Spacer(Modifier.height(16.dp))
+			Spacer(Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = pass,
-                onValueChange = { pass = it },
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                visualTransformation = PasswordVisualTransformation()
-            )
+			OutlinedTextField(
+				value = pass,
+				onValueChange = { pass = it },
+				label = { Text("Password") },
+				modifier = Modifier.fillMaxWidth(),
+				shape = RoundedCornerShape(12.dp),
+				visualTransformation = PasswordVisualTransformation()
+			)
 
-            Spacer(Modifier.height(16.dp))
+			Spacer(Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    showToast("Email login not available yet. Please use Google Sign-In.")
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Login")
-            }
+			Button(
+				onClick = {
+					if (email.isBlank() || pass.isBlank()) {
+						showToast("Please fill in all fields")
+					} else {
+						viewModel.loginWithEmail(
+							email = email,
+							password = pass,
+							onError = { showToast(it) }
+						)
+					}
+				},
+				modifier = Modifier.fillMaxWidth()
+			) {
+				Text("Login")
+			}
 
-            Spacer(Modifier.height(12.dp))
+			Spacer(Modifier.height(12.dp))
 
-            Text("Or")
+			Text("Or")
 
-            Spacer(Modifier.height(12.dp))
+			Spacer(Modifier.height(12.dp))
 
-            Button(
-                onClick = {
-                    kotlinx.coroutines.MainScope().launch {
-                        authService.signIn(context)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Sign in with Google")
-            }
+			Button(
+				onClick = {
+					viewModel.loginWithGoogle(
+						context = context,
+						onError = { showToast(it) }
+					)
+				},
+				modifier = Modifier.fillMaxWidth()
+			) {
+				Text("Sign in with Google")
+			}
 
-            Spacer(Modifier.height(12.dp))
+			Spacer(Modifier.height(12.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Don't have an account yet?")
-                TextButton(
-                    onClick = { navController.navigate(Screen.Register) }
-                ) {
-                    Text("Sign Up")
-                }
-            }
-        }
-    }
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text("Don't have an account yet?")
+				TextButton(
+					onClick = { navController.navigate(Screen.Register) }
+				) {
+					Text("Sign Up")
+				}
+			}
+		}
+	}
 }

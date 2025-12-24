@@ -25,11 +25,15 @@ class RegistrationsRepoRealImpl : RegistrationsRepo {
 			}
 
 			override fun onCancelled(error: DatabaseError) {
-				TODO("Not yet implemented")
+				throw error.toException()
 			}
 		}
 		dbRef.addValueEventListener(listener)
 		awaitClose()
+	}
+
+	override suspend fun getAllRegistrations(): List<Registration> {
+		TODO("Not yet implemented")
 	}
 
 	override suspend fun getRegistrationByEmail(email: String): Registration? {

@@ -9,7 +9,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Role
+import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.service.AuthService
 import com.team.ian.ui.navigation.Screen
 import kotlinx.coroutines.delay
@@ -17,25 +19,48 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
 	navController: NavController,
+	authService: AuthService = AuthService.getInstance(),
+	alumniRepo: AlumniRepo = AlumniRepo.getInstance()
 ) {
 	LaunchedEffect(Unit) {
 		delay(1200)
 
-		val next = if (AuthService.getInstance().getCurrentUser()?.role == Role.ALUMNI) {
-			Screen.Home
-		} else if (AuthService.getInstance().getCurrentUser()?.role == Role.NONE) {
-			Screen.Pending
-		} else if (AuthService.getInstance().getCurrentUser()?.role == Role.ADMIN) {
-			Screen.AdminDashboard
-		} else if (AuthService.getInstance().getCurrentUser() != null) {
-			Screen.Login
-		} else {
-			Screen.Login
+		val user = authService.getCurrentUser()
+
+		// Not login
+		if (user == null) {
+			navigate(navController, Screen.Login)
+			return@LaunchedEffect
 		}
 
-		navController.navigate(next) {
-			popUpTo(Screen.Splash) { inclusive = true }
-			launchSingleTop = true
+		// Login and check alumni profile
+		val alumni = alumniRepo.getAlumniByUid(user.id)
+
+		when {
+			alumni == null -> {
+				// Login but never registered
+				navigate(navController, Screen.Register)
+			}
+
+			alumni.role == Role.ADMIN -> {
+				navigate(navController, Screen.Home) // change it back to admin dashboard when u re done
+			}
+
+			alumni.status == AccountStatus.PENDING -> {
+				navigate(navController, Screen.Pending)
+			}
+
+			alumni.status == AccountStatus.REJECTED -> {
+				navigate(navController, Screen.Rejected)
+			}
+
+			alumni.status == AccountStatus.APPROVED -> {
+				navigate(navController, Screen.Home)
+			}
+
+			else -> {
+				navigate(navController, Screen.Login)
+			}
 		}
 	}
 
@@ -47,5 +72,15 @@ fun SplashScreen(
 			text = "Ian²",
 			style = MaterialTheme.typography.displayMedium
 		)
+	}
+}
+
+private fun navigate(
+	navController: NavController,
+	screen: Screen
+) {
+	navController.navigate(screen) {
+		popUpTo(Screen.Splash) { inclusive = true }
+		launchSingleTop = true
 	}
 }
