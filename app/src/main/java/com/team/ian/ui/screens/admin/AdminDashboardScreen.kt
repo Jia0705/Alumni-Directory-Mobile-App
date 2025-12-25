@@ -26,19 +26,19 @@ import com.team.ian.ui.navigation.Screen
 @Composable
 fun AdminDashboard(navController: NavController) {
 	val viewModel: AdminDashboardViewModel = viewModel()
-	val registrations = viewModel.registrations.collectAsStateWithLifecycle().value
+	val pendingAlumni = viewModel.pendingAlumni.collectAsStateWithLifecycle().value
 	Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 		LazyColumn(
 			verticalArrangement = Arrangement.spacedBy(16.dp),
 			contentPadding = PaddingValues(16.dp),
 			modifier = Modifier.fillMaxWidth()
 		) {
-			items(registrations) {
+			items(pendingAlumni) {
 				Card(
 					elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier
 						.fillMaxWidth()
 						.clickable {
-							navController.navigate(Screen.AdminViewRegistration(it.id))
+							navController.navigate(Screen.AdminViewPendingAlumni(it.uid))
 						}
 				) {
 					Row(
@@ -47,15 +47,16 @@ fun AdminDashboard(navController: NavController) {
 							.padding(16.dp)
 					) {
 						Column(modifier = Modifier.fillMaxSize()) {
-							Text("${it.name}, ${it.email}")
+							Text("${it.fullName}, ${it.email}")
 						}
 					}
 				}
 			}
 		}
 	}
-	if (registrations.isEmpty()) {
+	if (pendingAlumni.isEmpty()) {
 		Column(
+			modifier = Modifier.fillMaxSize(),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {

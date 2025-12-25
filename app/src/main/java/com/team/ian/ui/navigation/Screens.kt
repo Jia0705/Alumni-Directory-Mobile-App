@@ -12,5 +12,5 @@ sealed class Screen {
     @Serializable object Pending: Screen()
 		@Serializable object Rejected: Screen()
 		@Serializable object AdminDashboard: Screen()
-		@Serializable data class AdminViewRegistration(val registrationId: String): Screen()
+		@Serializable data class AdminViewPendingAlumni(val pendingAlumniId: String): Screen()
 }

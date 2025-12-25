@@ -1,33 +1,32 @@
 package com.team.ian.ui.screens.admin
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.Registration
-import com.team.ian.data.repo.RegistrationsRepo
+import com.team.ian.data.repo.AlumniRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AdminDashboardViewModel(
-	private val registrationsRepo: RegistrationsRepo = RegistrationsRepo.getInstance(),
-): ViewModel() {
-	private val _registrations = MutableStateFlow(emptyList<Registration>())
-	val registrations = _registrations.asStateFlow()
+	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance(),
+) : ViewModel() {
+	private val _pendingAlumni = MutableStateFlow(emptyList<Alumni>())
+	val pendingAlumni = _pendingAlumni.asStateFlow()
 
 	init {
-		getAllRegistrations()
+		getAllAlumni()
 	}
 
-	fun getAllRegistrations() {
-		viewModelScope.launch(Dispatchers.IO) {
-			try{
-				registrationsRepo.getAllRegistrationsFlow().collect {
-					_registrations.value = it
+	fun getAllAlumni() { viewModelScope.launch(Dispatchers.IO) {
+			try {
+				alumniRepo.getPendingAlumni().collect {
+					_pendingAlumni.value = it
 				}
-			}catch (e: Exception){
+			} catch (e: Exception) {
 				Log.d("debugging", e.toString())
 			}
 		}
