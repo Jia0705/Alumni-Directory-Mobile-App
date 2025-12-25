@@ -3,6 +3,7 @@ package com.team.ian.ui.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -32,7 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.admin.AdminDashboard
-import com.team.ian.ui.screens.admin.AdminViewRegistration
+import com.team.ian.ui.screens.admin.AdminViewPendingAlumniScreen
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
@@ -53,7 +54,8 @@ fun AppNav() {
 
 	val drawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
-		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
+		DrawerItem("Profile", Icons.Default.Person, Screen.Profile),
+		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard)
 	)
 
 	val snackbarHostState = remember { SnackbarHostState() }
@@ -165,9 +167,10 @@ fun AppNav() {
 						AdminDashboard(navController)
 					}
 
-					composable<Screen.AdminViewRegistration> {
-						AdminViewRegistration(navController)
+					composable<Screen.AdminViewPendingAlumni> {
+						AdminViewPendingAlumniScreen(navController)
 					}
+
 				}
 			}
 		}
