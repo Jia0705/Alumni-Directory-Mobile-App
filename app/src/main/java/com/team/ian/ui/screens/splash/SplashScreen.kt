@@ -46,6 +46,11 @@ fun SplashScreen(
 		// Login and check alumni profile
 		val alumni = alumniRepo.getAlumniByUid(user.id)
 
+		if (alumni != null) {
+			// Update user role in AuthService
+			authService.updateUserRole(alumni.role)
+		}
+
 		when {
 			alumni == null -> {
 				// Login but never registered

@@ -10,6 +10,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.team.ian.data.model.Role
 import com.team.ian.data.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,6 +72,13 @@ class AuthService private constructor() {
 	}
 
 	fun getCurrentUser(): User? = _user.value
+
+	// Update user role from Alumni profile
+	fun updateUserRole(role: Role) {
+		_user.update { currentUser ->
+			currentUser?.copy(role = role)
+		}
+	}
 
 	// Token
 	private suspend fun getGoogleCredentialToken(context: Context): String? {
