@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
@@ -36,6 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.admin.AdminDashboard
 import com.team.ian.ui.screens.admin.AdminViewPendingAlumniScreen
+import com.team.ian.ui.screens.admin.ApprovedAlumniScreen
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
@@ -61,6 +63,7 @@ fun AppNav() {
 	val allDrawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
 		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard, Role.ADMIN),
+		DrawerItem("Approved Alumni", Icons.Default.People, Screen.ApprovedAlumni),
 		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
 
@@ -208,6 +211,10 @@ fun AppNav() {
 					PendingScreen(navController)
 				}
 
+					
+        composable<Screen.ApprovedAlumni> {
+						ApprovedAlumniScreen(navController)
+					}
 				composable<Screen.Rejected> {
 					RejectedScreen(navController)
 				}

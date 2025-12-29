@@ -17,10 +17,10 @@ class AdminDashboardViewModel(
 	val pendingAlumni = _pendingAlumni.asStateFlow()
 
 	init {
-		getAllAlumni()
+		getAllPendingAlumni()
 	}
 
-	fun getAllAlumni() {
+	fun getAllPendingAlumni() {
 		viewModelScope.launch(Dispatchers.IO) {
 			try {
 				alumniRepo.getPendingAlumni().collect {

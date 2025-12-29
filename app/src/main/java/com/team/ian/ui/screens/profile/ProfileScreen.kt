@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,12 +9,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,11 +44,11 @@ fun ProfileScreen(
 	val user = authService.user.collectAsStateWithLifecycle().value
 
 	fun signOut() {
-			authService.signOut()
-			navController.navigate(Screen.Splash) {
-				popUpTo(Screen.Splash) { inclusive = true }
-				launchSingleTop = true
-			}
+		authService.signOut()
+		navController.navigate(Screen.Splash) {
+			popUpTo(Screen.Splash) { inclusive = true }
+			launchSingleTop = true
+		}
 	}
 
 	Box(
@@ -59,9 +64,10 @@ fun ProfileScreen(
 			)
 		} else {
 			Card(
-				modifier = Modifier.fillMaxWidth(),
+				modifier = Modifier
+					.fillMaxWidth(),
 				elevation = CardDefaults.cardElevation(4.dp),
-				shape = RoundedCornerShape(16.dp)
+				shape = RoundedCornerShape(16.dp),
 			) {
 				Column(
 					modifier = Modifier
@@ -69,59 +75,81 @@ fun ProfileScreen(
 						.padding(32.dp),
 					horizontalAlignment = Alignment.CenterHorizontally
 				) {
-
-					if (user.photoURL.isNotBlank()) {
-						AsyncImage(
-							model = ImageRequest.Builder(context)
-								.data(user.photoURL)
-								.crossfade(true)
-								.build(),
-							contentDescription = "Profile photo",
-							modifier = Modifier
-								.fillMaxWidth(0.4f)
-								.aspectRatio(1f)
-								.clip(CircleShape)
-						)
-
-						Spacer(Modifier.height(24.dp))
-					}
-
-					Text(
-						text = user.name.ifBlank { "User" },
-						style = MaterialTheme.typography.headlineMedium,
-						fontWeight = FontWeight.Bold,
-						color = MaterialTheme.colorScheme.primary
-					)
-
-					Spacer(Modifier.height(8.dp))
-
-					Text(
-						text = user.email,
-						style = MaterialTheme.typography.bodyLarge,
-						color = MaterialTheme.colorScheme.onSurfaceVariant
-					)
-
-					Spacer(Modifier.height(24.dp))
-
-					HorizontalDivider()
-
-					Spacer(Modifier.height(24.dp))
-
-					Button(
-						onClick = { signOut() },
+					Box(
 						modifier = Modifier
-							.fillMaxWidth()
-							.height(50.dp),
-						shape = RoundedCornerShape(12.dp)
+							.fillMaxWidth(0.8f)
+							.aspectRatio(1f)
+							.clip(CircleShape)
 					) {
-						Text(
-							text = "Sign Out",
-							style = MaterialTheme.typography.bodyLarge,
-							fontWeight = FontWeight.Bold
-						)
+						if (user.photoURL.isNotBlank()) {
+							AsyncImage(
+								model = ImageRequest.Builder(context)
+									.data(user.photoURL)
+									.crossfade(true)
+									.build(),
+								contentDescription = "Profile photo",
+								modifier = Modifier
+									.fillMaxSize()
+							)
+						} else {
+							Box(
+								modifier = Modifier
+									.fillMaxSize()
+									.background(
+										MaterialTheme.colorScheme.surfaceVariant,
+										CircleShape
+									),
+								contentAlignment = Alignment.Center
+							) {
+								Icon(
+									imageVector = Icons.Default.Person,
+									contentDescription = "No profile photo",
+									modifier = Modifier.size(36.dp),
+									tint = MaterialTheme.colorScheme.surfaceVariant
+								)
+							}
+						}
 					}
+
+					Spacer(Modifier.height(24.dp))
+				}
+
+				Text(
+					text = user.name.ifBlank { "User" },
+					style = MaterialTheme.typography.headlineMedium,
+					fontWeight = FontWeight.Bold,
+					color = MaterialTheme.colorScheme.primary
+				)
+
+				Spacer(Modifier.height(8.dp))
+
+				Text(
+					text = user.email,
+					style = MaterialTheme.typography.bodyLarge,
+					color = MaterialTheme.colorScheme.onSurfaceVariant
+				)
+
+				Spacer(Modifier.height(24.dp))
+
+				HorizontalDivider()
+
+				Spacer(Modifier.height(24.dp))
+
+				Button(
+					onClick = { signOut() },
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(50.dp),
+					shape = RoundedCornerShape(12.dp)
+				) {
+					Text(
+						text = "Sign Out",
+						style = MaterialTheme.typography.bodyLarge,
+						fontWeight = FontWeight.Bold
+					)
 				}
 			}
 		}
 	}
 }
+
