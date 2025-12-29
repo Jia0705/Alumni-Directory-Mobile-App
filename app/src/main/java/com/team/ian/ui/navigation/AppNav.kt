@@ -54,8 +54,8 @@ fun AppNav() {
 
 	val drawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
-		DrawerItem("Profile", Icons.Default.Person, Screen.Profile),
-		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard)
+		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard),
+		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
 
 	val snackbarHostState = remember { SnackbarHostState() }

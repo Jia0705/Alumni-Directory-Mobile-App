@@ -24,10 +24,16 @@ import androidx.navigation.NavController
 import com.team.ian.ui.navigation.Screen
 
 @Composable
-fun AdminDashboard(navController: NavController) {
+fun AdminDashboard(
+	navController: NavController
+) {
 	val viewModel: AdminDashboardViewModel = viewModel()
 	val pendingAlumni = viewModel.pendingAlumni.collectAsStateWithLifecycle().value
-	Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+	Box(
+		modifier = Modifier.fillMaxSize(),
+		contentAlignment = Alignment.Center
+	) {
 		LazyColumn(
 			verticalArrangement = Arrangement.spacedBy(16.dp),
 			contentPadding = PaddingValues(16.dp),
@@ -35,7 +41,8 @@ fun AdminDashboard(navController: NavController) {
 		) {
 			items(pendingAlumni) {
 				Card(
-					elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier
+					elevation = CardDefaults.cardElevation(4.dp),
+					modifier = Modifier
 						.fillMaxWidth()
 						.clickable {
 							navController.navigate(Screen.AdminViewPendingAlumni(it.uid))
