@@ -1,6 +1,7 @@
 package com.team.ian.ui.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -43,6 +45,8 @@ import com.team.ian.ui.screens.status.PendingScreen
 import com.team.ian.ui.screens.status.RejectedScreen
 import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
+import com.team.ian.service.AuthService
+import com.team.ian.data.model.Role
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,12 +55,19 @@ fun AppNav() {
 	val navController = rememberNavController()
 	val drawerState = rememberDrawerState(DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
+	val authService = AuthService.getInstance()
+	val currentUser = authService.user.collectAsStateWithLifecycle().value
 
-	val drawerItems = listOf(
+	val allDrawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
-		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard),
+		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard, Role.ADMIN),
 		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
+
+	// Filter drawer items based on user role
+	val drawerItems = allDrawerItems.filter { item ->
+		item.requiredRole == null || currentUser?.role == item.requiredRole
+	}
 
 	val snackbarHostState = remember { SnackbarHostState() }
 
@@ -80,18 +91,19 @@ fun AppNav() {
 		Screen.Login::class.qualifiedName,
 		Screen.Register::class.qualifiedName,
 		Screen.Pending::class.qualifiedName,
-		Screen.Rejected::class.qualifiedName
+		Screen.Rejected::class.qualifiedName,
+		Screen.AdminViewPendingAlumni::class.qualifiedName
 	)
 
 	val showScaffold =
 		currentRoute !in noScaffoldScreens &&
 				drawerItems.any { it.screen::class.qualifiedName == currentRoute }
 
-	ModalNavigationDrawer(
-		drawerState = drawerState,
-		gesturesEnabled = showScaffold,
-		drawerContent = {
-			if (showScaffold) {
+	if (showScaffold) {
+		ModalNavigationDrawer(
+			drawerState = drawerState,
+			gesturesEnabled = true,
+			drawerContent = {
 				ModalDrawerSheet {
 					drawerItems.forEach { item ->
 						NavigationDrawerItem(
@@ -108,12 +120,10 @@ fun AppNav() {
 					}
 				}
 			}
-		}
-	) {
-		Scaffold(
-			snackbarHost = { SnackbarHost(snackbarHostState) },
-			topBar = {
-				if (showScaffold) {
+		) {
+			Scaffold(
+				snackbarHost = { SnackbarHost(snackbarHostState) },
+				topBar = {
 					CenterAlignedTopAppBar(
 						title = { Text("Ian²") },
 						navigationIcon = {
@@ -125,54 +135,102 @@ fun AppNav() {
 						}
 					)
 				}
-			}
-		) { padding ->
-			Box(Modifier.padding(padding)) {
-				FullScreenLoader()
+			) { padding ->
+				Box(Modifier.padding(padding)) {
+					NavHost(
+						navController = navController,
+						startDestination = Screen.Splash
+					) {
 
-				NavHost(
-					navController = navController,
-					startDestination = Screen.Splash
-				) {
+						composable<Screen.Splash> {
+							SplashScreen(navController)
+						}
 
-					composable<Screen.Splash> {
-						SplashScreen(navController)
+						composable<Screen.Login> {
+							LoginScreen(navController)
+						}
+
+						composable<Screen.Register> {
+							RegisterScreen(navController)
+						}
+
+						composable<Screen.Pending> {
+							PendingScreen(navController)
+						}
+
+						composable<Screen.Rejected> {
+							RejectedScreen(navController)
+						}
+
+						composable<Screen.Home> {
+							HomeScreen(navController)
+						}
+
+						composable<Screen.Profile> {
+							ProfileScreen(navController)
+						}
+
+						composable<Screen.AdminDashboard> {
+							AdminDashboard(navController)
+						}
+
+						composable<Screen.AdminViewPendingAlumni> {
+							AdminViewPendingAlumniScreen(navController)
+						}
+
 					}
 
-					composable<Screen.Login> {
-						LoginScreen(navController)
-					}
-
-					composable<Screen.Register> {
-						RegisterScreen(navController)
-					}
-
-					composable<Screen.Pending> {
-						PendingScreen(navController)
-					}
-
-					composable<Screen.Rejected> {
-						RejectedScreen(navController)
-					}
-
-					composable<Screen.Home> {
-						HomeScreen(navController)
-					}
-
-					composable<Screen.Profile> {
-						ProfileScreen(navController)
-					}
-
-					composable<Screen.AdminDashboard> {
-						AdminDashboard(navController)
-					}
-
-					composable<Screen.AdminViewPendingAlumni> {
-						AdminViewPendingAlumniScreen(navController)
-					}
-
+					FullScreenLoader()
 				}
 			}
+		}
+	} else {
+		// Screens without scaffold
+		Box(Modifier.fillMaxSize()) {
+			NavHost(
+				navController = navController,
+				startDestination = Screen.Splash
+			) {
+
+				composable<Screen.Splash> {
+					SplashScreen(navController)
+				}
+
+				composable<Screen.Login> {
+					LoginScreen(navController)
+				}
+
+				composable<Screen.Register> {
+					RegisterScreen(navController)
+				}
+
+				composable<Screen.Pending> {
+					PendingScreen(navController)
+				}
+
+				composable<Screen.Rejected> {
+					RejectedScreen(navController)
+				}
+
+				composable<Screen.Home> {
+					HomeScreen(navController)
+				}
+
+				composable<Screen.Profile> {
+					ProfileScreen(navController)
+				}
+
+				composable<Screen.AdminDashboard> {
+					AdminDashboard(navController)
+				}
+
+				composable<Screen.AdminViewPendingAlumni> {
+					AdminViewPendingAlumniScreen(navController)
+				}
+
+			}
+
+			FullScreenLoader()
 		}
 	}
 }
@@ -180,5 +238,6 @@ fun AppNav() {
 data class DrawerItem(
 	val title: String,
 	val icon: ImageVector,
-	val screen: Screen
+	val screen: Screen,
+	val requiredRole: Role? = null
 )
