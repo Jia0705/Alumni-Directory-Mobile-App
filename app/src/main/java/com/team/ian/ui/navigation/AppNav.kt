@@ -129,7 +129,6 @@ fun AppNav() {
 		) { padding ->
 			Box(Modifier.padding(padding)) {
 				FullScreenLoader()
-
 				NavHost(
 					navController = navController,
 					startDestination = Screen.Splash

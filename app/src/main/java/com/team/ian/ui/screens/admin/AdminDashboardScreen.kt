@@ -38,7 +38,8 @@ fun AdminDashboard(navController: NavController) {
 					elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier
 						.fillMaxWidth()
 						.clickable {
-							navController.navigate(Screen.AdminViewPendingAlumni(it.uid))
+//							navController.navigate(Screen.AdminViewPendingAlumni(it.uid!!))
+							navController.navigate(Screen.AdminViewPendingAlumni(it.uid!!))
 						}
 				) {
 					Row(
@@ -53,14 +54,14 @@ fun AdminDashboard(navController: NavController) {
 				}
 			}
 		}
-	}
-	if (pendingAlumni.isEmpty()) {
-		Column(
-			modifier = Modifier.fillMaxSize(),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.Center
-		) {
-			Text("No registrations")
+		if (pendingAlumni.isEmpty()) {
+			Column(
+				modifier = Modifier.fillMaxSize(),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.Center
+			) {
+				Text("No registrations")
+			}
 		}
 	}
 }

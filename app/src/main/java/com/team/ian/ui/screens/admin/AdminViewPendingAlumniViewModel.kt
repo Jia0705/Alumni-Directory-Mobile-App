@@ -11,6 +11,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.repo.AlumniRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,18 +21,21 @@ class AdminViewPendingAlumniViewModel @Inject constructor(
 	private val alumniRepo: AlumniRepo
 ) : ViewModel() {
 	private val pendingAlumniId = savedStateHandle.get<String>("pendingAlumniId")!!
-	private val _pendingAlumni = MutableStateFlow(Alumni())
+	private val _pendingAlumni = MutableStateFlow<Alumni?>(null)
+	private val _finish = MutableSharedFlow<Unit>()
+	val finish = _finish.asSharedFlow()
 	val pendingAlumni = _pendingAlumni.asStateFlow()
 
 	init {
 		getPendingAlumniById(pendingAlumniId)
 	}
 
-	fun getPendingAlumniById(id: String) {
+	fun getPendingAlumniById(uid: String) {
 		viewModelScope.launch(Dispatchers.IO) {
 			try {
-				alumniRepo.getAlumniByUid(id)?.let {
+				alumniRepo.getAlumniByUid(uid)?.let {
 					_pendingAlumni.value = it
+					Log.d("debugging",pendingAlumni.value.toString())
 				}
 			} catch (e: Exception) {
 				Log.d("debugging", e.toString())
@@ -38,4 +43,16 @@ class AdminViewPendingAlumniViewModel @Inject constructor(
 		}
 	}
 
+	fun approveAlumni(uid: String) {
+		viewModelScope.launch(Dispatchers.IO) {
+			try {
+				Log.d("debugging", "starting to approve")
+				alumniRepo.approveAlumni(uid)
+				Log.d("debugging", "approved")
+				_finish.emit(Unit)
+			}catch (e: Exception){
+				Log.d("debugging", e.toString())
+			}
+		}
+	}
 }
