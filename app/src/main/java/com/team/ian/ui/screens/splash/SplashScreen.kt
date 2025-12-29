@@ -1,13 +1,23 @@
 package com.team.ian.ui.screens.splash
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Role
@@ -68,10 +78,37 @@ fun SplashScreen(
 		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.Center
 	) {
-		Text(
-			text = "Ian²",
-			style = MaterialTheme.typography.displayMedium
-		)
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			Icon(
+				imageVector = Icons.Default.School,
+				contentDescription = null,
+				modifier = Modifier.size(80.dp),
+				tint = MaterialTheme.colorScheme.primary
+			)
+
+			Spacer(Modifier.height(24.dp))
+
+			Text(
+				text = "Ian²",
+				style = MaterialTheme.typography.displayLarge,
+				fontWeight = FontWeight.Bold,
+				color = MaterialTheme.colorScheme.primary
+			)
+
+			Spacer(Modifier.height(8.dp))
+
+			Text(
+				text = "Alumni Directory",
+				style = MaterialTheme.typography.titleMedium,
+				color = MaterialTheme.colorScheme.onSurfaceVariant
+			)
+
+			Spacer(Modifier.height(32.dp))
+
+			CircularProgressIndicator()
+		}
 	}
 }
 

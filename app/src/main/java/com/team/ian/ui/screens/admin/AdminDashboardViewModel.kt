@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.Alumni
-import com.team.ian.data.model.Registration
 import com.team.ian.data.repo.AlumniRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,8 @@ class AdminDashboardViewModel(
 		getAllAlumni()
 	}
 
-	fun getAllAlumni() { viewModelScope.launch(Dispatchers.IO) {
+	fun getAllAlumni() {
+		viewModelScope.launch(Dispatchers.IO) {
 			try {
 				alumniRepo.getPendingAlumni().collect {
 					_pendingAlumni.value = it
@@ -31,5 +31,4 @@ class AdminDashboardViewModel(
 			}
 		}
 	}
-
 }
