@@ -38,4 +38,25 @@ class AdminViewPendingAlumniViewModel @Inject constructor(
 		}
 	}
 
+	fun approveAlumni() {
+		viewModelScope.launch(Dispatchers.IO) {
+			try {
+				alumniRepo.approveAlumni(pendingAlumniId)
+				Log.d("debugging", "Alumni approved")
+			} catch (e: Exception) {
+				Log.e("debugging", "Error: ${e.message}")
+			}
+		}
+	}
+
+	fun rejectAlumni() {
+		viewModelScope.launch(Dispatchers.IO) {
+			try {
+				alumniRepo.rejectAlumni(pendingAlumniId)
+				Log.d("debugging", "Alumni rejected")
+			} catch (e: Exception) {
+				Log.e("debugging", "Error: ${e.message}")
+			}
+		}
+	}
 }

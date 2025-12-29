@@ -34,14 +34,6 @@ fun AdminViewPendingAlumniScreen(
 	val viewModel: AdminViewPendingAlumniViewModel = hiltViewModel()
 	val alumni = viewModel.pendingAlumni.collectAsStateWithLifecycle().value
 
-	fun approve() {
-
-	}
-
-	fun reject() {
-
-	}
-
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
@@ -122,7 +114,10 @@ fun AdminViewPendingAlumniScreen(
 					horizontalArrangement = Arrangement.spacedBy(12.dp)
 				) {
 					Button(
-						onClick = { approve() },
+						onClick = {
+							viewModel.approveAlumni()
+							navController.popBackStack()
+						},
 						modifier = Modifier
 							.weight(1f)
 							.height(50.dp),
@@ -136,7 +131,10 @@ fun AdminViewPendingAlumniScreen(
 					}
 
 					OutlinedButton(
-						onClick = { reject() },
+						onClick = {
+							viewModel.rejectAlumni()
+							navController.popBackStack()
+						},
 						modifier = Modifier
 							.weight(1f)
 							.height(50.dp),
