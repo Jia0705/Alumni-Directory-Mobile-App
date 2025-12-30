@@ -14,7 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class AdminViewPendingAlumniViewModel @Inject constructor(
+class AdminViewRegistrationViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val alumniRepo: AlumniRepo
 ) : ViewModel() {

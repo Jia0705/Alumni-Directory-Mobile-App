@@ -35,9 +35,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.team.ian.ui.screens.admin.AdminDashboard
-import com.team.ian.ui.screens.admin.AdminViewPendingAlumniScreen
-import com.team.ian.ui.screens.admin.ApprovedAlumniScreen
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
@@ -49,6 +46,10 @@ import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
 import com.team.ian.service.AuthService
 import com.team.ian.data.model.Role
+import com.team.ian.ui.screens.admin.AdminEditAlumniProfileScreen
+import com.team.ian.ui.screens.admin.AdminManageAlumniScreen
+import com.team.ian.ui.screens.admin.AdminViewAllRegistrationsScreen
+import com.team.ian.ui.screens.admin.AdminViewRegistrationScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +63,8 @@ fun AppNav() {
 
 	val allDrawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
-		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard, Role.ADMIN),
-		DrawerItem("Approved Alumni", Icons.Default.People, Screen.ApprovedAlumni),
+		DrawerItem("Admin View Pending Registrations", Icons.Default.Dashboard, Screen.AdminViewAllRegistrations, Role.ADMIN),
+		DrawerItem("Admin Manage Alumni", Icons.Default.People, Screen.AdminManageAlumni, Role.ADMIN),
 		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
 
@@ -95,7 +96,7 @@ fun AppNav() {
 		Screen.Register::class.qualifiedName,
 		Screen.Pending::class.qualifiedName,
 		Screen.Rejected::class.qualifiedName,
-		Screen.AdminViewPendingAlumni::class.qualifiedName
+		Screen.AdminViewRegistration::class.qualifiedName
 	)
 
 	val showScaffold =
@@ -165,6 +166,10 @@ fun AppNav() {
 							RejectedScreen(navController)
 						}
 
+						composable<Screen.AdminManageAlumni> {
+							AdminManageAlumniScreen(navController)
+						}
+
 						composable<Screen.Home> {
 							HomeScreen(navController)
 						}
@@ -173,12 +178,16 @@ fun AppNav() {
 							ProfileScreen(navController)
 						}
 
-						composable<Screen.AdminDashboard> {
-							AdminDashboard(navController)
+						composable<Screen.AdminViewAllRegistrations> {
+							AdminViewAllRegistrationsScreen(navController)
 						}
 
-						composable<Screen.AdminViewPendingAlumni> {
-							AdminViewPendingAlumniScreen(navController)
+						composable<Screen.AdminViewRegistration> {
+							AdminViewRegistrationScreen(navController)
+						}
+
+						composable<Screen.AdminEditAlumniProfile> {
+							AdminEditAlumniProfileScreen(navController)
 						}
 
 					}
@@ -211,10 +220,10 @@ fun AppNav() {
 					PendingScreen(navController)
 				}
 
-					
-        composable<Screen.ApprovedAlumni> {
-						ApprovedAlumniScreen(navController)
-					}
+				composable<Screen.AdminManageAlumni> {
+					AdminManageAlumniScreen(navController)
+				}
+
 				composable<Screen.Rejected> {
 					RejectedScreen(navController)
 				}
@@ -227,12 +236,16 @@ fun AppNav() {
 					ProfileScreen(navController)
 				}
 
-				composable<Screen.AdminDashboard> {
-					AdminDashboard(navController)
+				composable<Screen.AdminViewAllRegistrations> {
+					AdminViewAllRegistrationsScreen(navController)
 				}
 
-				composable<Screen.AdminViewPendingAlumni> {
-					AdminViewPendingAlumniScreen(navController)
+				composable<Screen.AdminViewRegistration> {
+					AdminViewRegistrationScreen(navController)
+				}
+
+				composable<Screen.AdminEditAlumniProfile> {
+					AdminEditAlumniProfileScreen(navController)
 				}
 
 			}

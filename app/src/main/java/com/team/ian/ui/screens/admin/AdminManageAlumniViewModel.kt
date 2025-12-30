@@ -10,20 +10,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ApprovedAlumniViewModel(
+class AdminManageAlumniViewModel(
 	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance()
 ): ViewModel(){
 	private val _alumni = MutableStateFlow(emptyList<Alumni>())
 	val alumni = _alumni.asStateFlow()
 
 	init {
-		getAllAlumni()
+		getAllUsers()
 	}
 
-	fun getAllAlumni(){
+	fun getAllUsers(){
 		viewModelScope.launch (Dispatchers.IO) {
 			try{
-				alumniRepo.getApprovedAlumni().collect {
+				alumniRepo.getAllAlumniExceptForPending().collect {
 					_alumni.value = it
 				}
 			}catch (e: Exception){

@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,11 +36,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.request.ImageRequest
 import coil.compose.AsyncImage
+import com.team.ian.data.model.AccountStatus
+import com.team.ian.ui.navigation.Screen
 
 
 @Composable
-fun ApprovedAlumniScreen(navController: NavController) {
-	val viewModel: ApprovedAlumniViewModel = viewModel()
+fun AdminManageAlumniScreen(navController: NavController) {
+	val viewModel: AdminManageAlumniViewModel = viewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
 	val context = LocalContext.current
 
@@ -57,7 +60,16 @@ fun ApprovedAlumniScreen(navController: NavController) {
 					Card(
 						elevation = CardDefaults.cardElevation(4.dp),
 						modifier = Modifier.clickable(onClick = {
-						})
+							navController.navigate(Screen.AdminEditAlumniProfile(it.uid))
+						}),
+						colors = CardDefaults.cardColors(
+							containerColor = when (it.status) {
+								AccountStatus.APPROVED -> Color.Green.copy(alpha = 0.2f)
+								AccountStatus.INACTIVE -> Color.Gray.copy(alpha = 0.2f)
+								AccountStatus.REJECTED -> Color.Red.copy(alpha = 0.2f)
+								else -> Color.Black
+							}
+						)
 					) {
 						Row(
 							modifier = Modifier

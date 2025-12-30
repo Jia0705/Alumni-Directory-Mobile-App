@@ -24,10 +24,10 @@ import androidx.navigation.NavController
 import com.team.ian.ui.navigation.Screen
 
 @Composable
-fun AdminDashboard(
+fun AdminViewAllRegistrationsScreen(
 	navController: NavController
 ) {
-	val viewModel: AdminDashboardViewModel = viewModel()
+	val viewModel: AdminViewAllRegistrationsViewModel = viewModel()
 	val pendingAlumni = viewModel.pendingAlumni.collectAsStateWithLifecycle().value
 
 	Box(
@@ -45,7 +45,7 @@ fun AdminDashboard(
 					modifier = Modifier
 						.fillMaxWidth()
 						.clickable {
-							navController.navigate(Screen.AdminViewPendingAlumni(it.uid))
+							navController.navigate(Screen.AdminViewRegistration(it.uid))
 						}
 				) {
 					Row(

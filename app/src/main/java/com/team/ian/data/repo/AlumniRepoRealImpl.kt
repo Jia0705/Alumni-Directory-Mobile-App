@@ -30,6 +30,22 @@ class AlumniRepoRealImpl : AlumniRepo {
 			.getValue(Alumni::class.java)
 	}
 
+	override fun getAllAlumniExceptForPending(): Flow<List<Alumni>> = callbackFlow {
+		val listener = object : ValueEventListener {
+			override fun onDataChange(snapshot: DataSnapshot) {
+				val list = snapshot.children
+					.mapNotNull { it.getValue(Alumni::class.java) }
+					.filter { it.status != AccountStatus.PENDING }
+				trySend(list)
+			}
+			override fun onCancelled(error: DatabaseError) {
+				close(error.toException())
+			}
+		}
+		dbRef.addValueEventListener(listener)
+		awaitClose { dbRef.removeEventListener(listener) }
+	}
+
 	// Alumni only
 	override fun getApprovedAlumni(): Flow<List<Alumni>> = callbackFlow {
 		val listener = object : ValueEventListener {
@@ -57,6 +73,44 @@ class AlumniRepoRealImpl : AlumniRepo {
 				val list = snapshot.children
 					.mapNotNull { it.getValue(Alumni::class.java) }
 					.filter { it.status == AccountStatus.PENDING }
+
+				trySend(list)
+			}
+
+			override fun onCancelled(error: DatabaseError) {
+				close(error.toException())
+			}
+		}
+
+		dbRef.addValueEventListener(listener)
+		awaitClose { dbRef.removeEventListener(listener) }
+	}
+
+	override fun getInactiveAlumni(): Flow<List<Alumni>> = callbackFlow {
+		val listener = object : ValueEventListener {
+			override fun onDataChange(snapshot: DataSnapshot) {
+				val list = snapshot.children
+					.mapNotNull { it.getValue(Alumni::class.java) }
+					.filter { it.status == AccountStatus.INACTIVE }
+
+				trySend(list)
+			}
+
+			override fun onCancelled(error: DatabaseError) {
+				close(error.toException())
+			}
+		}
+
+		dbRef.addValueEventListener(listener)
+		awaitClose { dbRef.removeEventListener(listener) }
+	}
+
+	override fun getRejectedAlumni(): Flow<List<Alumni>> = callbackFlow {
+		val listener = object : ValueEventListener {
+			override fun onDataChange(snapshot: DataSnapshot) {
+				val list = snapshot.children
+					.mapNotNull { it.getValue(Alumni::class.java) }
+					.filter { it.status == AccountStatus.INACTIVE }
 
 				trySend(list)
 			}
