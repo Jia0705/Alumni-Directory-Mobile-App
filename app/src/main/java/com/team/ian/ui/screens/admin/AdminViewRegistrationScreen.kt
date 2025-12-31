@@ -26,12 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.team.ian.components.InfoRow
 
 @Composable
-fun AdminViewPendingAlumniScreen(
+fun AdminViewRegistrationScreen(
 	navController: NavController
 ) {
-	val viewModel: AdminViewPendingAlumniViewModel = hiltViewModel()
+	val viewModel: AdminViewRegistrationViewModel = hiltViewModel()
 	val alumni = viewModel.pendingAlumni.collectAsStateWithLifecycle().value
 
 	Box(
@@ -149,20 +150,5 @@ fun AdminViewPendingAlumniScreen(
 				}
 			}
 		}
-	}
-}
-
-@Composable
-fun InfoRow(label: String, value: String) {
-	Column(modifier = Modifier.padding(vertical = 4.dp)) {
-		Text(
-			text = label,
-			style = MaterialTheme.typography.labelMedium,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
-		)
-		Text(
-			text = value.ifBlank { "-" },
-			style = MaterialTheme.typography.bodyLarge
-		)
 	}
 }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AdminDashboardViewModel(
+class AdminViewAllRegistrationsViewModel(
 	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance(),
 ) : ViewModel() {
 	private val _pendingAlumni = MutableStateFlow(emptyList<Alumni>())
