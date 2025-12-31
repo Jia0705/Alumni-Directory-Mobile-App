@@ -29,9 +29,5 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ComposeApp() {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-            AppNav()
-        }
-    }
+    AppNav()
 }

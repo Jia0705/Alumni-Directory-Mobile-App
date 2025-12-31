@@ -1,4 +1,4 @@
-package com.team.ian.ui.screens.admin
+package com.team.ian.ui.screens.profile
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -10,24 +10,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ApprovedAlumniViewModel(
+class ProfileViewModel(
 	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance()
-): ViewModel(){
-	private val _alumni = MutableStateFlow(emptyList<Alumni>())
+) : ViewModel() {
+	private val _alumni = MutableStateFlow(Alumni())
 	val alumni = _alumni.asStateFlow()
 
-	init {
-		getAllAlumni()
-	}
-
-	fun getAllAlumni(){
-		viewModelScope.launch (Dispatchers.IO) {
-			try{
-				alumniRepo.getApprovedAlumni().collect {
+	fun loadAlumniProfile(userId: String) {
+		viewModelScope.launch(Dispatchers.IO) {
+			try {
+				alumniRepo.getAlumniByUid(userId)?.let {
 					_alumni.value = it
 				}
-			}catch (e: Exception){
-				Log.d("debugging",e.toString())
+			} catch (e: Exception) {
+				Log.d("debugging", e.toString())
 			}
 		}
 	}
