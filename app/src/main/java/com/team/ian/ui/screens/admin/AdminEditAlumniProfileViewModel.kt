@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
+import com.team.ian.data.model.AlumniField
 import com.team.ian.data.repo.AlumniRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +37,43 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 			} catch (e: Exception) {
 				Log.d("debugging", e.toString())
 			}
+		}
+	}
+
+	fun updateAlumniField(field: AlumniField, value: String){
+		val current = _alumni.value
+		val updated = when(field) {
+//			basic info
+			AlumniField.FULL_NAME -> current.copy(fullName = value)
+			AlumniField.EMAIL -> current.copy(email = value)
+			AlumniField.GRAD_YEAR -> current.copy(graduationYear = value.toInt())
+			AlumniField.DEPARTMENT -> current.copy(department = value)
+
+//			professional info
+			AlumniField.JOB_TITLE -> current.copy(jobTitle = value)
+			AlumniField.COMPANY -> current.copy(company = value)
+			AlumniField.TECH_STACK -> current.copy(primaryStack = value)
+
+//			locational info
+			AlumniField.CITY -> current.copy(city = value)
+			AlumniField.COUNTRY -> current.copy(country = value)
+		}
+		_alumni.value = updated
+	}
+
+	fun updateAlumniStatusState(status: AccountStatus){
+		val current = _alumni.value
+		current.copy(status = status)
+	}
+
+	fun resetAllStates(){
+		getAlumniById(alumniId)
+	}
+
+	fun finishEditing(){
+		val updatedTask = _alumni.value
+		try {
+			viewModelScope.launch(Disp) {  }
 		}
 	}
 

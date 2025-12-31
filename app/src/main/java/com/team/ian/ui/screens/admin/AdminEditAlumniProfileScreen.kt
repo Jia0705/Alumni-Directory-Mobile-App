@@ -2,6 +2,7 @@ package com.team.ian.ui.screens.admin
 
 import android.R
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +36,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.components.InfoRow
+import com.team.ian.components.InfoTextField
 import com.team.ian.data.model.AccountStatus
+import com.team.ian.data.model.AlumniField
 import com.team.ian.service.AuthService
 
 @Composable
@@ -44,6 +48,7 @@ fun AdminEditAlumniProfileScreen(
 	val context = LocalContext.current
 	val viewModel: AdminEditAlumniProfileViewModel = hiltViewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
+	val mutableAlumni = { mutableStateOf(alumni) }
 
 	Box(
 		modifier = Modifier
@@ -78,11 +83,34 @@ fun AdminEditAlumniProfileScreen(
 				)
 
 				Spacer(Modifier.height(12.dp))
-
-				InfoRow("Full Name", alumni.fullName)
-				InfoRow("Email", alumni.email)
-				InfoRow("Graduation Year", alumni.graduationYear.toString())
-				InfoRow("Department", alumni.department)
+				InfoTextField(
+					label = "Full Name",
+					value = alumni.fullName,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.FULL_NAME, it)
+					}
+				)
+				InfoTextField(
+					label = "Email",
+					value = alumni.email,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.EMAIL, it)
+					}
+				)
+				InfoTextField(
+					label = "Graduation Year",
+					value = alumni.graduationYear.toString(),
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.GRAD_YEAR, it)
+					}
+				)
+				InfoTextField(
+					label = "Department",
+					value = alumni.department,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.DEPARTMENT, it)
+					}
+				)
 
 				Spacer(Modifier.height(16.dp))
 				HorizontalDivider()
@@ -97,9 +125,27 @@ fun AdminEditAlumniProfileScreen(
 
 				Spacer(Modifier.height(12.dp))
 
-				InfoRow("Job Title", alumni.jobTitle)
-				InfoRow("Company", alumni.company)
-				InfoRow("Tech Stack", alumni.primaryStack)
+				InfoTextField(
+					label = "Job Title",
+					value = alumni.jobTitle,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.JOB_TITLE, it)
+					}
+				)
+				InfoTextField(
+					label = "Company",
+					value = alumni.company,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.COMPANY, it)
+					}
+				)
+				InfoTextField(
+					label = "Tech Stack",
+					value = alumni.primaryStack,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.TECH_STACK, it)
+					}
+				)
 
 				Spacer(Modifier.height(16.dp))
 				HorizontalDivider()
@@ -114,8 +160,20 @@ fun AdminEditAlumniProfileScreen(
 
 				Spacer(Modifier.height(12.dp))
 
-				InfoRow("City", alumni.city)
-				InfoRow("Country", alumni.country)
+				InfoTextField(
+					label = "City",
+					value = alumni.city,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.CITY, it)
+					}
+				)
+				InfoTextField(
+					label = "Country",
+					value = alumni.country,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.COUNTRY, it)
+					}
+				)
 
 				HorizontalDivider()
 				Spacer(Modifier.height(16.dp))
@@ -127,23 +185,8 @@ fun AdminEditAlumniProfileScreen(
 				)
 				Spacer(Modifier.height(12.dp))
 				Row(
-					modifier = Modifier.fillMaxWidth(),
-					) {
-					Column(
-						Modifier
-							.weight(1f)
-							.background(
-								if (alumni.status == AccountStatus.REJECTED) {
-									Color.Red.copy(alpha = 0.2f)
-								} else {
-									Color.Transparent
-								}
-							)
-							.fillMaxHeight(),
-						horizontalAlignment = Alignment.CenterHorizontally,
-					) {
-						Text("Rejected")
-					}
+					modifier = Modifier.fillMaxWidth()
+				) {
 					Column(
 						Modifier
 							.weight(1f)
@@ -154,10 +197,31 @@ fun AdminEditAlumniProfileScreen(
 									Color.Transparent
 								}
 							)
-							.fillMaxHeight(),
-						horizontalAlignment = Alignment.CenterHorizontally
+							.fillMaxHeight()
+							.clickable {
+								viewModel.updateAlumniStatusState(AccountStatus.APPROVED)
+							},
+						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
 						Text("Approved")
+					}
+					Column(
+						Modifier
+							.weight(1f)
+							.background(
+								if (alumni.status == AccountStatus.REJECTED) {
+									Color.Red.copy(alpha = 0.2f)
+								} else {
+									Color.Transparent
+								}
+							)
+							.fillMaxHeight()
+							.clickable {
+								viewModel.updateAlumniStatusState(AccountStatus.REJECTED)
+							},
+						horizontalAlignment = Alignment.CenterHorizontally,
+					) {
+						Text("Rejected")
 					}
 					Column(
 						Modifier
@@ -169,8 +233,11 @@ fun AdminEditAlumniProfileScreen(
 									Color.Transparent
 								}
 							)
-							.fillMaxHeight(),
-						horizontalAlignment = Alignment.CenterHorizontally
+							.fillMaxHeight()
+							.clickable {
+								viewModel.updateAlumniStatusState(AccountStatus.INACTIVE)
+							},
+						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
 						Text("Inactive")
 					}
@@ -185,8 +252,7 @@ fun AdminEditAlumniProfileScreen(
 				) {
 					Button(
 						onClick = {
-//							viewModel.approveAlumni()
-							navController.popBackStack()
+							viewModel.resetAllStates()
 						},
 						modifier = Modifier
 							.weight(1f)
@@ -194,15 +260,13 @@ fun AdminEditAlumniProfileScreen(
 						shape = RoundedCornerShape(12.dp)
 					) {
 						Text(
-							text = "Approve",
+							text = "Reset all",
 							style = MaterialTheme.typography.bodyLarge,
 							fontWeight = FontWeight.Bold
 						)
 					}
-
 					OutlinedButton(
 						onClick = {
-//							viewModel.rejectAlumni()
 							navController.popBackStack()
 						},
 						modifier = Modifier
@@ -211,7 +275,7 @@ fun AdminEditAlumniProfileScreen(
 						shape = RoundedCornerShape(12.dp)
 					) {
 						Text(
-							text = "Reject",
+							text = "Done",
 							style = MaterialTheme.typography.bodyLarge,
 							fontWeight = FontWeight.Bold
 						)
