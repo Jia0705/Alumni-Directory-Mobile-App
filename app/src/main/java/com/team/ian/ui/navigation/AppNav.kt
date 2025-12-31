@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
@@ -37,7 +36,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.admin.AdminDashboard
 import com.team.ian.ui.screens.admin.AdminViewPendingAlumniScreen
-import com.team.ian.ui.screens.admin.ApprovedAlumniScreen
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
@@ -49,6 +47,7 @@ import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
 import com.team.ian.service.AuthService
 import com.team.ian.data.model.Role
+import com.team.ian.ui.screens.viewProfile.ViewProfileScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +62,6 @@ fun AppNav() {
 	val allDrawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
 		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard, Role.ADMIN),
-		DrawerItem("Approved Alumni", Icons.Default.People, Screen.ApprovedAlumni),
 		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
 
@@ -95,7 +93,8 @@ fun AppNav() {
 		Screen.Register::class.qualifiedName,
 		Screen.Pending::class.qualifiedName,
 		Screen.Rejected::class.qualifiedName,
-		Screen.AdminViewPendingAlumni::class.qualifiedName
+		Screen.AdminViewPendingAlumni::class.qualifiedName,
+		Screen.ViewProfile::class.qualifiedName,
 	)
 
 	val showScaffold =
@@ -181,6 +180,9 @@ fun AppNav() {
 							AdminViewPendingAlumniScreen(navController)
 						}
 
+						composable<Screen.ViewProfile> {
+							ViewProfileScreen(navController)
+						}
 					}
 
 					FullScreenLoader()
@@ -211,10 +213,6 @@ fun AppNav() {
 					PendingScreen(navController)
 				}
 
-					
-        composable<Screen.ApprovedAlumni> {
-						ApprovedAlumniScreen(navController)
-					}
 				composable<Screen.Rejected> {
 					RejectedScreen(navController)
 				}
@@ -235,6 +233,9 @@ fun AppNav() {
 					AdminViewPendingAlumniScreen(navController)
 				}
 
+				composable<Screen.ViewProfile> {
+					ViewProfileScreen(navController)
+				}
 			}
 
 			FullScreenLoader()
