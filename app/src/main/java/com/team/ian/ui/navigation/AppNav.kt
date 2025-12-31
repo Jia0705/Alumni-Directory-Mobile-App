@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
@@ -50,6 +49,7 @@ import com.team.ian.ui.screens.admin.AdminEditAlumniProfileScreen
 import com.team.ian.ui.screens.admin.AdminManageAlumniScreen
 import com.team.ian.ui.screens.admin.AdminViewAllRegistrationsScreen
 import com.team.ian.ui.screens.admin.AdminViewRegistrationScreen
+import com.team.ian.ui.screens.viewProfile.ViewProfileScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +96,9 @@ fun AppNav() {
 		Screen.Register::class.qualifiedName,
 		Screen.Pending::class.qualifiedName,
 		Screen.Rejected::class.qualifiedName,
-		Screen.AdminViewRegistration::class.qualifiedName
+		Screen.AdminViewRegistration::class.qualifiedName,
+    Screen.AdminEditAlumniProfile::class.qualifiedName,
+    Screen.ViewProfile::class.qualifiedName
 	)
 
 	val showScaffold =
@@ -190,6 +192,9 @@ fun AppNav() {
 							AdminEditAlumniProfileScreen(navController)
 						}
 
+						composable<Screen.ViewProfile> {
+							ViewProfileScreen(navController)
+						}
 					}
 
 					FullScreenLoader()
@@ -248,6 +253,9 @@ fun AppNav() {
 					AdminEditAlumniProfileScreen(navController)
 				}
 
+				composable<Screen.ViewProfile> {
+					ViewProfileScreen(navController)
+				}
 			}
 
 			FullScreenLoader()
