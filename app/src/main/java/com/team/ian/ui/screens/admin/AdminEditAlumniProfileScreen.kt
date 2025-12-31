@@ -1,6 +1,5 @@
 package com.team.ian.ui.screens.admin
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,31 +23,33 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.team.ian.components.InfoRow
 import com.team.ian.components.InfoTextField
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.AlumniField
-import com.team.ian.service.AuthService
+import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
 fun AdminEditAlumniProfileScreen(
 	navController: NavController
 ) {
-	val context = LocalContext.current
 	val viewModel: AdminEditAlumniProfileViewModel = hiltViewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
-	val mutableAlumni = { mutableStateOf(alumni) }
+
+	LaunchedEffect(Unit) {
+		viewModel.finish.collect {
+			setRefresh(navController)
+			navController.popBackStack()
+		}
+	}
 
 	Box(
 		modifier = Modifier
@@ -267,6 +268,7 @@ fun AdminEditAlumniProfileScreen(
 					}
 					OutlinedButton(
 						onClick = {
+							viewModel.finishEditing()
 							navController.popBackStack()
 						},
 						modifier = Modifier

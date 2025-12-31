@@ -35,7 +35,7 @@ class AlumniRepoRealImpl : AlumniRepo {
 			override fun onDataChange(snapshot: DataSnapshot) {
 				val list = snapshot.children
 					.mapNotNull { it.getValue(Alumni::class.java) }
-					.filter { it.status != AccountStatus.PENDING }
+					.filter { it.status != AccountStatus.PENDING && it.role != Role.ADMIN }
 				trySend(list)
 			}
 			override fun onCancelled(error: DatabaseError) {

@@ -10,7 +10,9 @@ import com.team.ian.data.model.AlumniField
 import com.team.ian.data.repo.AlumniRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,10 +21,13 @@ import javax.inject.Inject
 class AdminEditAlumniProfileViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val alumniRepo: AlumniRepo
-): ViewModel() {
+) : ViewModel() {
 	private val alumniId = savedStateHandle.get<String>("alumniId")!!
 	private val _alumni = MutableStateFlow(Alumni())
 	val alumni = _alumni.asStateFlow()
+
+	private val _finish = MutableSharedFlow<Unit>()
+	val finish = _finish.asSharedFlow()
 
 	init {
 		getAlumniById(alumniId)
@@ -40,9 +45,9 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 		}
 	}
 
-	fun updateAlumniField(field: AlumniField, value: String){
+	fun updateAlumniField(field: AlumniField, value: String) {
 		val current = _alumni.value
-		val updated = when(field) {
+		val updated = when (field) {
 //			basic info
 			AlumniField.FULL_NAME -> current.copy(fullName = value)
 			AlumniField.EMAIL -> current.copy(email = value)
@@ -61,19 +66,51 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 		_alumni.value = updated
 	}
 
-	fun updateAlumniStatusState(status: AccountStatus){
+	fun updateAlumniStatusState(updatedStatus: AccountStatus) {
 		val current = _alumni.value
-		current.copy(status = status)
+		_alumni.value = current.copy(status = updatedStatus)
 	}
 
-	fun resetAllStates(){
+	fun resetAllStates() {
 		getAlumniById(alumniId)
 	}
 
-	fun finishEditing(){
-		val updatedTask = _alumni.value
-		try {
-			viewModelScope.launch(Disp) {  }
+	fun finishEditing() {
+		val updatedAlumni = _alumni.value
+		val fieldsToCheck = listOf(
+			updatedAlumni.fullName,
+			updatedAlumni.email,
+			updatedAlumni.department,
+			updatedAlumni.jobTitle,
+			updatedAlumni.company,
+			updatedAlumni.primaryStack,
+			updatedAlumni.city,
+			updatedAlumni.country,
+		)
+		for (field in fieldsToCheck) {
+			require(field.isNotBlank()) {
+				"$field cannot be empty"
+			}
+		}
+		viewModelScope.launch(Dispatchers.IO) {
+			try {
+				val updates = mapOf<String, Any>(
+					"fullName" to updatedAlumni.fullName,
+					"email" to updatedAlumni.email,
+					"graduationYear" to updatedAlumni.graduationYear,
+					"department" to updatedAlumni.department,
+					"jobTitle" to updatedAlumni.jobTitle,
+					"company" to updatedAlumni.company,
+					"primaryStack" to updatedAlumni.primaryStack,
+					"city" to updatedAlumni.city,
+					"country" to updatedAlumni.country,
+					"status" to updatedAlumni.status
+				)
+				alumniRepo.updateProfile(alumniId, updates)
+				_finish.emit(Unit)
+			} catch (e: Exception) {
+				Log.d("debugging", e.toString())
+			}
 		}
 	}
 
