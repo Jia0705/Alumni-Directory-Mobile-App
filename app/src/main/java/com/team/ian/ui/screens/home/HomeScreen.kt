@@ -108,7 +108,8 @@ fun HomeScreen(
 							Icon(
 								Icons.Default.Clear,
 								contentDescription = null,
-								modifier = Modifier.size(18.dp
+								modifier = Modifier.size(
+									18.dp
 								)
 							)
 						}
@@ -169,66 +170,66 @@ fun HomeScreen(
 					verticalItemSpacing = 16.dp,
 					contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
 					content = {
-				items(alumni) {
-					Card(
-						elevation = CardDefaults.cardElevation(4.dp),
-						modifier = Modifier.clickable {
-							navController.navigate(Screen.ViewProfile(it.uid))
-						}
-					) {
-						Row(
-							modifier = Modifier
-								.fillMaxSize()
-								.padding(16.dp)
-						) {
-							Column(
-								modifier = Modifier.fillMaxSize(),
-								verticalArrangement = Arrangement.spacedBy(5.dp),
-								horizontalAlignment = Alignment.CenterHorizontally
+						items(alumni) {
+							Card(
+								elevation = CardDefaults.cardElevation(4.dp),
+								modifier = Modifier.clickable {
+									navController.navigate(Screen.ViewProfile(it.uid))
+								}
 							) {
-								Box(
+								Row(
 									modifier = Modifier
-										.fillMaxWidth(0.8f)
-										.aspectRatio(1f)
-										.clip(CircleShape)
+										.fillMaxSize()
+										.padding(16.dp)
 								) {
-									if (it.photoURL.isNotBlank()) {
-										AsyncImage(
-											model = ImageRequest.Builder(context)
-												.data(it.photoURL)
-												.crossfade(true)
-												.build(),
-											contentDescription = "Profile photo",
-											modifier = Modifier
-												.fillMaxSize()
-										)
-									} else {
+									Column(
+										modifier = Modifier.fillMaxSize(),
+										verticalArrangement = Arrangement.spacedBy(5.dp),
+										horizontalAlignment = Alignment.CenterHorizontally
+									) {
 										Box(
 											modifier = Modifier
-												.fillMaxSize()
-												.background(
-													MaterialTheme.colorScheme.surfaceVariant,
-													CircleShape
-												),
-											contentAlignment = Alignment.Center
+												.fillMaxWidth(0.8f)
+												.aspectRatio(1f)
+												.clip(CircleShape)
 										) {
-											Icon(
-												imageVector = Icons.Default.Person,
-												contentDescription = "No profile photo",
-												modifier = Modifier.size(36.dp),
-												tint = MaterialTheme.colorScheme.surfaceVariant
-											)
+											if (it.photoURL.isNotBlank()) {
+												AsyncImage(
+													model = ImageRequest.Builder(context)
+														.data(it.photoURL)
+														.crossfade(true)
+														.build(),
+													contentDescription = "Profile photo",
+													modifier = Modifier
+														.fillMaxSize()
+												)
+											} else {
+												Box(
+													modifier = Modifier
+														.fillMaxSize()
+														.background(
+															MaterialTheme.colorScheme.surfaceVariant,
+															CircleShape
+														),
+													contentAlignment = Alignment.Center
+												) {
+													Icon(
+														imageVector = Icons.Default.Person,
+														contentDescription = "No profile photo",
+														modifier = Modifier.size(36.dp),
+														tint = MaterialTheme.colorScheme.surfaceVariant
+													)
+												}
+											}
 										}
+										Spacer(modifier = Modifier.height(16.dp))
+										Text("${it.fullName}, ${it.email}")
 									}
 								}
-								Spacer(modifier = Modifier.height(16.dp))
-								Text("${it.fullName}, ${it.email}")
 							}
 						}
 					}
-				}
-			}
-		)
+				)
 			}
 		}
 	}
