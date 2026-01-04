@@ -1,4 +1,4 @@
-package com.team.ian.ui.screens.admin
+package com.team.ian.ui.screens.admin.registrations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
