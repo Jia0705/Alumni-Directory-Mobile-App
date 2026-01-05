@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
@@ -45,10 +46,10 @@ import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
 import com.team.ian.service.AuthService
 import com.team.ian.data.model.Role
-import com.team.ian.ui.screens.admin.AdminEditAlumniProfileScreen
-import com.team.ian.ui.screens.admin.AdminManageAlumniScreen
-import com.team.ian.ui.screens.admin.AdminViewAllRegistrationsScreen
-import com.team.ian.ui.screens.admin.AdminViewRegistrationScreen
+import com.team.ian.ui.screens.admin.manage_alumni.AdminEditAlumniProfileScreen
+import com.team.ian.ui.screens.admin.manage_alumni.AdminManageAlumniScreen
+import com.team.ian.ui.screens.admin.registrations.AdminViewAllRegistrationsScreen
+import com.team.ian.ui.screens.admin.registrations.AdminViewRegistrationScreen
 import com.team.ian.ui.screens.viewProfile.ViewProfileScreen
 import kotlinx.coroutines.launch
 
