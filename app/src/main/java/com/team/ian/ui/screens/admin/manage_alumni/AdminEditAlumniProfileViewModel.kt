@@ -1,4 +1,4 @@
-package com.team.ian.ui.screens.admin
+package com.team.ian.ui.screens.admin.manage_alumni
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle

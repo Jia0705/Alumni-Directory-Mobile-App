@@ -1,4 +1,4 @@
-package com.team.ian.ui.screens.admin
+package com.team.ian.ui.screens.admin.registrations
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
