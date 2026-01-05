@@ -204,6 +204,22 @@ fun ProfileScreen(
 					Spacer(Modifier.height(24.dp))
 
 					Button(
+						onClick = { navController.navigate(Screen.EditOwnProfile) },
+						modifier = Modifier
+							.fillMaxWidth()
+							.height(50.dp),
+						shape = RoundedCornerShape(12.dp)
+					) {
+						Text(
+							text = "Edit Profile",
+							style = MaterialTheme.typography.bodyLarge,
+							fontWeight = FontWeight.Bold
+						)
+					}
+
+					Spacer(Modifier.height(12.dp))
+
+					Button(
 						onClick = { signOut() },
 						modifier = Modifier
 							.fillMaxWidth()

@@ -11,6 +11,7 @@ enum class AlumniField {
 	TECH_STACK,
 	CITY,
 	COUNTRY,
+	LINKEDIN,
+	GITHUB,
+	PHONE
 }
-
-

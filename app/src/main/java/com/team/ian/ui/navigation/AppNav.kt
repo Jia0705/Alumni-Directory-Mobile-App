@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
@@ -36,6 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
+import com.team.ian.ui.screens.profile.EditOwnProfileScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
 import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
@@ -180,6 +182,10 @@ fun AppNav() {
 							ProfileScreen(navController)
 						}
 
+						composable<Screen.EditOwnProfile> {
+							EditOwnProfileScreen(navController)
+						}
+
 						composable<Screen.AdminViewAllRegistrations> {
 							AdminViewAllRegistrationsScreen(navController)
 						}
@@ -239,6 +245,10 @@ fun AppNav() {
 
 				composable<Screen.Profile> {
 					ProfileScreen(navController)
+				}
+
+				composable<Screen.EditOwnProfile> {
+					EditOwnProfileScreen(navController)
 				}
 
 				composable<Screen.AdminViewAllRegistrations> {
