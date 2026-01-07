@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.profile
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -29,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.components.InfoTextField
 import com.team.ian.data.model.AlumniField
+import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
@@ -171,6 +174,16 @@ fun EditOwnProfileScreen(
 				HorizontalDivider()
 				Spacer(Modifier.height(16.dp))
 
+				TextButton(onClick = {
+					Log.d("debugging", "navigate")
+					navController.navigate(
+						Screen.AddExtendedInformation(alumni.uid)
+					)
+				}) {
+					Text("Add extended info to your profile?")
+				}
+
+				Spacer(Modifier.height(16.dp))
 
 				// Buttons
 				Row(

@@ -6,6 +6,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
+import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.data.model.Role
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.tasks.await
 
 class AlumniRepoRealImpl : AlumniRepo {
 	private val dbRef = FirebaseDatabase.getInstance().getReference("users")
+	private val dbRefExtended = FirebaseDatabase.getInstance().getReference("extendedInfo")
 
 	// Create alumni profile after registration
 	// Called after create Firebase Auth account
@@ -159,5 +161,16 @@ class AlumniRepoRealImpl : AlumniRepo {
 			"updatedAt" to System.currentTimeMillis()
 		)
 		dbRef.child(uid).updateChildren(updates).await()
+	}
+
+	override suspend fun addExtendedInfo(uid: String, extendedInfo: ExtendedInfo) {
+		dbRefExtended.child(extendedInfo.uid).setValue(extendedInfo).await()
+	}
+
+	override suspend fun viewExtendedInfo(uid: String, extendedInfo: ExtendedInfo): ExtendedInfo? {
+		return dbRefExtended.child(extendedInfo.uid)
+			.get()
+			.await()
+			.getValue(ExtendedInfo::class.java)
 	}
 }
