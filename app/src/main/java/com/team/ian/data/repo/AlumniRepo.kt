@@ -1,5 +1,6 @@
 package com.team.ian.data.repo
 
+import android.net.Uri
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.ExtendedInfo
 import kotlinx.coroutines.flow.Flow
@@ -16,8 +17,10 @@ interface AlumniRepo {
 	suspend fun approveAlumni(uid: String)
 	suspend fun rejectAlumni(uid: String)
 	suspend fun deactivateAlumni(uid: String)
-	suspend fun addExtendedInfo(uid: String, extendedInfo: ExtendedInfo)
-	suspend fun viewExtendedInfo(uid: String, extendedInfo: ExtendedInfo): ExtendedInfo?
+	suspend fun addExtendedInfo(extendedInfo: ExtendedInfo)
+	suspend fun getExtendedInfo(uid: String): ExtendedInfo?
+
+	suspend fun uploadProfilePhoto(uid: String, imageUri: Uri)
 
 	companion object {
 		private var instance: AlumniRepo? = null

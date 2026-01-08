@@ -1,5 +1,7 @@
 package com.team.ian.data.repo
 
+import android.net.Uri
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -40,6 +42,7 @@ class AlumniRepoRealImpl : AlumniRepo {
 					.filter { it.status != AccountStatus.PENDING && it.role != Role.ADMIN }
 				trySend(list)
 			}
+
 			override fun onCancelled(error: DatabaseError) {
 				close(error.toException())
 			}
@@ -163,14 +166,25 @@ class AlumniRepoRealImpl : AlumniRepo {
 		dbRef.child(uid).updateChildren(updates).await()
 	}
 
-	override suspend fun addExtendedInfo(uid: String, extendedInfo: ExtendedInfo) {
+	override suspend fun addExtendedInfo(extendedInfo: ExtendedInfo) {
 		dbRefExtended.child(extendedInfo.uid).setValue(extendedInfo).await()
 	}
 
-	override suspend fun viewExtendedInfo(uid: String, extendedInfo: ExtendedInfo): ExtendedInfo? {
-		return dbRefExtended.child(extendedInfo.uid)
+	override suspend fun getExtendedInfo(uid: String): ExtendedInfo? {
+		return dbRefExtended.child(uid)
 			.get()
 			.await()
 			.getValue(ExtendedInfo::class.java)
 	}
+
+	// TODO: probably remove
+	override suspend fun uploadProfilePhoto(uid: String, imageUri: Uri) {
+		Log.d("debugging", "uploadProfilePhoto trigger?")
+//		val fileName = "profile_${uid}_${UUID.randomUUID()}.jpg"
+//		val storageRef = dbRefExtended.ref
+//		val imageRef = storageRef.child("profile_photos/$uid/$fileName")
+
+//		imageRef.putFile
+	}
 }
+

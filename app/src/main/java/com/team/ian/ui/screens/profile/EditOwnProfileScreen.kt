@@ -40,6 +40,7 @@ fun EditOwnProfileScreen(
 ) {
 	val viewModel: EditOwnProfileViewModel = viewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
+	val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
 
 	LaunchedEffect(Unit) {
 		viewModel.finish.collect {
@@ -175,17 +176,25 @@ fun EditOwnProfileScreen(
 				Spacer(Modifier.height(16.dp))
 
 				TextButton(onClick = {
-					Log.d("debugging", "navigate")
-					navController.navigate(
-						Screen.AddExtendedInformation(alumni.uid)
-					)
+					if (extendedInfo) {
+						navController.navigate(
+							Screen.ExtendedInfo
+						)
+					} else {
+						navController.navigate(
+							Screen.AddOrEditExtendedInfo
+						)
+					}
 				}) {
-					Text("Add extended info to your profile?")
+					if (extendedInfo) {
+						Text("View extended information")
+					} else {
+						Text("Add Extended information to your profile")
+					}
 				}
 
 				Spacer(Modifier.height(16.dp))
 
-				// Buttons
 				Row(
 					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.spacedBy(12.dp)

@@ -31,5 +31,7 @@ sealed class Screen {
 	@Serializable
 	data class ViewProfile(val alumniId: String) : Screen()
 	@Serializable
-	data class AddExtendedInformation(val alumniId: String): Screen()
+	object AddOrEditExtendedInfo: Screen()
+	@Serializable
+	object ExtendedInfo: Screen()
 }

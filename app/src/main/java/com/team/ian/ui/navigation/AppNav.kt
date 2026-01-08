@@ -51,7 +51,8 @@ import com.team.ian.ui.screens.admin.manage_alumni.AdminEditAlumniProfileScreen
 import com.team.ian.ui.screens.admin.manage_alumni.AdminManageAlumniScreen
 import com.team.ian.ui.screens.admin.registrations.AdminViewAllRegistrationsScreen
 import com.team.ian.ui.screens.admin.registrations.AdminViewRegistrationScreen
-import com.team.ian.ui.screens.profile.AddExtendedInformationScreen
+import com.team.ian.ui.screens.profile.AddOrEditExtendedInfoScreen
+import com.team.ian.ui.screens.profile.ExtendedInfoScreen
 import com.team.ian.ui.screens.viewProfile.ViewProfileScreen
 import kotlinx.coroutines.launch
 
@@ -203,9 +204,14 @@ fun AppNav() {
 							ViewProfileScreen(navController)
 						}
 
-						composable<Screen.AddExtendedInformation> {
-							AddExtendedInformationScreen(navController)
+						composable<Screen.AddOrEditExtendedInfo> {
+							AddOrEditExtendedInfoScreen(navController)
 						}
+
+						composable<Screen.ExtendedInfo> {
+							ExtendedInfoScreen(navController)
+						}
+
 					}
 
 					FullScreenLoader()
@@ -272,8 +278,12 @@ fun AppNav() {
 					ViewProfileScreen(navController)
 				}
 
-				composable<Screen.AddExtendedInformation> {
-					AddExtendedInformationScreen(navController)
+				composable<Screen.AddOrEditExtendedInfo> {
+					AddOrEditExtendedInfoScreen(navController)
+				}
+
+				composable<Screen.ExtendedInfo> {
+					ExtendedInfoScreen(navController)
 				}
 			}
 

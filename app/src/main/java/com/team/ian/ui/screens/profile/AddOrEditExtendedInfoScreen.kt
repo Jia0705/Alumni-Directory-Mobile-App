@@ -1,9 +1,7 @@
 package com.team.ian.ui.screens.profile
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -48,12 +46,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
-fun AddExtendedInformationScreen(navController: NavController) {
+fun AddOrEditExtendedInfoScreen(navController: NavController) {
+	val viewModel: AddOrEditExtendedInfoViewModel = viewModel()
 	var selectedImageUri by remember { mutableStateOf<Uri?>(null) } // Stores the Uri of the selected image (uri from gallery)
 	var loadedBitmap by remember { mutableStateOf<Bitmap?>(null) } // Stores the actual bitmap after loading
 	var isLoading by remember { mutableStateOf(false) }
@@ -63,32 +62,44 @@ fun AddExtendedInformationScreen(navController: NavController) {
 	var pastJobHistory by remember { mutableStateOf(listOf("")) }
 	val context = LocalContext.current
 
-	LaunchedEffect(selectedImageUri) { // Runs when selectedImageUri changes
-		selectedImageUri?.let { uri ->
-			isLoading = true
-			loadError = false
-			loadedBitmap = withContext(Dispatchers.IO) { // Loads bitmap on the background thread
-				try {
-					context.contentResolver.openInputStream(uri)?.use { inputStream -> // Reads image file using the uri
-						BitmapFactory.decodeStream(inputStream) // Converts stream to bitmap object
-					}
-				} catch (e: Exception) {
-					Log.e("debugging", "Error loading bitmap ${e.message}")
-					loadError = true
-					null
-				} finally {
-					isLoading = false
-				}
-			}
-		} ?: run {
-			loadedBitmap = null
-			isLoading = false
-			loadError = false
+	// TODO: Remove this and decide on storage of image or no storage
+//	LaunchedEffect(selectedImageUri) { // Runs when selectedImageUri changes
+//		selectedImageUri?.let { uri ->
+//			isLoading = true
+//			loadError = false
+//			loadedBitmap = withContext(Dispatchers.IO) { // Loads bitmap on the background thread
+//				try {
+//					context.contentResolver.openInputStream(uri)?.use { inputStream -> // Reads image file using the uri
+//						BitmapFactory.decodeStream(inputStream) // Converts stream to bitmap object
+//					}
+//				} catch (e: Exception) {
+//					Log.e("debugging", "Error loading bitmap ${e.message}")
+//					loadError = true
+//					null
+//				} finally {
+//					isLoading = false
+//				}
+//			}
+//		} ?: run {
+//			loadedBitmap = null
+//			isLoading = false
+//			loadError = false
+//		}
+//	}
+
+	LaunchedEffect(Unit) {
+		viewModel.finish.collect {
+			setRefresh(navController)
+			navController.popBackStack()
 		}
 	}
 
 	fun complete() {
-		Log.d("debugging", "complete add extended information")
+		viewModel.addExtendedInfoToAlumni(
+			pastJobHistory,
+			skills,
+			shortBio
+		)
 	}
 
 
