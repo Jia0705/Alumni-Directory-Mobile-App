@@ -1,0 +1,15 @@
+// Test Approval Notification
+POST http://localhost:9999/send-approval HTTP/1.1
+Content-Type: application/json
+
+{
+    "token": "fCNl-r-CTPe7yrPuI4qRNA:APA91bHBAJljaxYlJeG4szdBYoB-nCEevAfnqwKKkkmq9NTzTwMCIP4HUFraU2UMX6dX4ZJFbkPpYQLWcw2hRYjidS20yEHn3hhZCPVWgcXQRu4DX7k4_04"
+}
+
+// Test Rejection Notification
+POST http://localhost:9999/send-rejection HTTP/1.1
+Content-Type: application/json
+
+{
+    "token": "fCNl-r-CTPe7yrPuI4qRNA:APA91bHBAJljaxYlJeG4szdBYoB-nCEevAfnqwKKkkmq9NTzTwMCIP4HUFraU2UMX6dX4ZJFbkPpYQLWcw2hRYjidS20yEHn3hhZCPVWgcXQRu4DX7k4_04"
+}
