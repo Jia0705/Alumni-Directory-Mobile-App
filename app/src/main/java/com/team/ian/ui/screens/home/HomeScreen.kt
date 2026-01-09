@@ -23,18 +23,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +70,10 @@ fun HomeScreen(
 	val stacks = viewModel.availableStacks.collectAsStateWithLifecycle().value
 	val countries = viewModel.availableCountries.collectAsStateWithLifecycle().value
 	val years = viewModel.availableYears.collectAsStateWithLifecycle().value
+	val showFilterDialog = remember { mutableStateOf(false) }
+	val tempStack = remember { mutableStateOf<String?>(null) }
+	val tempCountry = remember { mutableStateOf<String?>(null) }
+	val tempYear = remember { mutableStateOf<Int?>(null) }
 
 	Box(
 		modifier = Modifier.fillMaxSize()
@@ -91,62 +103,50 @@ fun HomeScreen(
 				singleLine = true
 			)
 
-			// Filter Chips
+			// Active filters + Filter Button
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
-					.horizontalScroll(rememberScrollState())
 					.padding(horizontal = 16.dp, vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp)
+				verticalAlignment = Alignment.CenterVertically
 			) {
-				// Clear All Filters
-				if (selectedStack != null || selectedCountry != null || selectedYear != null) {
-					AssistChip(
-						onClick = { viewModel.clearAllFilters() },
-						label = { Text("Clear All") },
-						leadingIcon = {
-							Icon(
-								Icons.Default.Clear,
-								contentDescription = null,
-								modifier = Modifier.size(
-									18.dp
-								)
-							)
-						}
-					)
+				Row(
+					modifier = Modifier
+						.weight(1f)
+						.horizontalScroll(rememberScrollState()),
+					horizontalArrangement = Arrangement.spacedBy(8.dp)
+				) {
+					if (selectedStack != null) {
+						AssistChip(
+							onClick = { viewModel.updateStackFilter(null) },
+							label = { Text("Stack: $selectedStack") }
+						)
+					}
+					if (selectedCountry != null) {
+						AssistChip(
+							onClick = { viewModel.updateCountryFilter(null) },
+							label = { Text("Country: $selectedCountry") }
+						)
+					}
+					if (selectedYear != null) {
+						AssistChip(
+							onClick = { viewModel.updateYearFilter(null) },
+							label = { Text("Year: $selectedYear") }
+						)
+					}
 				}
 
-				// Tech Stack Filters
-				stacks.take(5).forEach { stack ->
-					FilterChip(
-						selected = selectedStack == stack,
-						onClick = {
-							viewModel.updateStackFilter(if (selectedStack == stack) null else stack)
-						},
-						label = { Text(stack) }
-					)
-				}
-
-				// Country Filters
-				countries.take(5).forEach { country ->
-					FilterChip(
-						selected = selectedCountry == country,
-						onClick = {
-							viewModel.updateCountryFilter(if (selectedCountry == country) null else country)
-						},
-						label = { Text(country) }
-					)
-				}
-
-				// Year Filters
-				years.take(5).forEach { year ->
-					FilterChip(
-						selected = selectedYear == year,
-						onClick = {
-							viewModel.updateYearFilter(if (selectedYear == year) null else year)
-						},
-						label = { Text(year.toString()) }
-					)
+				TextButton(
+					onClick = {
+						tempStack.value = selectedStack
+						tempCountry.value = selectedCountry
+						tempYear.value = selectedYear
+						showFilterDialog.value = true
+					}
+				) {
+					Icon(Icons.Default.FilterList, contentDescription = null)
+					Spacer(Modifier.size(6.dp))
+					Text("Filters")
 				}
 			}
 
@@ -230,6 +230,110 @@ fun HomeScreen(
 						}
 					}
 				)
+			}
+		}
+	}
+
+	if (showFilterDialog.value) {
+		AlertDialog(
+			onDismissRequest = { showFilterDialog.value = false },
+			title = { Text("Filters") },
+			text = {
+				Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+					FilterDropdown(
+						label = "Tech Stack",
+						options = stacks,
+						selected = tempStack.value,
+						onSelect = { tempStack.value = it }
+					)
+					FilterDropdown(
+						label = "Country",
+						options = countries,
+						selected = tempCountry.value,
+						onSelect = { tempCountry.value = it }
+					)
+					FilterDropdown(
+						label = "Graduation Year",
+						options = years.map { it.toString() },
+						selected = tempYear.value?.toString(),
+						onSelect = { value ->
+							tempYear.value = value?.toIntOrNull()
+						}
+					)
+				}
+			},
+			confirmButton = {
+				TextButton(
+					onClick = {
+						viewModel.updateStackFilter(tempStack.value)
+						viewModel.updateCountryFilter(tempCountry.value)
+						viewModel.updateYearFilter(tempYear.value)
+						showFilterDialog.value = false
+					}
+				) {
+					Text("Apply")
+				}
+			},
+			dismissButton = {
+				TextButton(
+					onClick = {
+						viewModel.clearAllFilters()
+						showFilterDialog.value = false
+					}
+				) {
+					Text("Clear")
+				}
+			}
+		)
+	}
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun FilterDropdown(
+	label: String,
+	options: List<String>,
+	selected: String?,
+	onSelect: (String?) -> Unit
+) {
+	val expanded = remember { mutableStateOf(false) }
+	Column {
+		Text(label, style = MaterialTheme.typography.bodyMedium)
+		ExposedDropdownMenuBox(
+			expanded = expanded.value,
+			onExpandedChange = { expanded.value = it }
+		) {
+			OutlinedTextField(
+				value = selected ?: "Any",
+				onValueChange = {},
+				readOnly = true,
+				modifier = Modifier
+					.fillMaxWidth()
+					.menuAnchor(),
+				trailingIcon = {
+					ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value)
+				}
+			)
+			ExposedDropdownMenu(
+				expanded = expanded.value,
+				onDismissRequest = { expanded.value = false }
+			) {
+				DropdownMenuItem(
+					text = { Text("Any") },
+					onClick = {
+						onSelect(null)
+						expanded.value = false
+					}
+				)
+				options.forEach { option ->
+					DropdownMenuItem(
+						text = { Text(option) },
+						onClick = {
+							onSelect(option)
+							expanded.value = false
+						}
+					)
+				}
 			}
 		}
 	}

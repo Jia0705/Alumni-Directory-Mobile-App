@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface AlumniRepo {
 	suspend fun createAlumni(alumni: Alumni)
 	suspend fun getAlumniByUid(uid: String): Alumni?
+	fun getAllUsers(): Flow<List<Alumni>>
 	fun getAllAlumniExceptForPending(): Flow<List<Alumni>>
 	fun getApprovedAlumni(): Flow<List<Alumni>>
 	fun getPendingAlumni(): Flow<List<Alumni>>

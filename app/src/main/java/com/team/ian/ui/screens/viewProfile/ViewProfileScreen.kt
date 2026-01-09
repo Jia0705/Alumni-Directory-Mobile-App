@@ -47,7 +47,8 @@ fun ViewProfileScreen(
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(16.dp)
+			.padding(16.dp),
+		contentAlignment = Alignment.Center
 	) {
 		Card(
 			modifier = Modifier.fillMaxWidth(),
