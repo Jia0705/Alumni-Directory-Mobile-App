@@ -49,5 +49,5 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ComposeApp() {
-    AppNav()
+	AppNav()
 }

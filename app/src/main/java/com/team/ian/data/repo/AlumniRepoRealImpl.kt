@@ -1,11 +1,14 @@
 package com.team.ian.data.repo
 
+import android.net.Uri
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
+import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.data.model.Role
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +17,7 @@ import kotlinx.coroutines.tasks.await
 
 class AlumniRepoRealImpl : AlumniRepo {
 	private val dbRef = FirebaseDatabase.getInstance().getReference("users")
+	private val dbRefExtended = FirebaseDatabase.getInstance().getReference("extendedInfo")
 
 	// Create alumni profile after registration
 	// Called after create Firebase Auth account
@@ -38,6 +42,7 @@ class AlumniRepoRealImpl : AlumniRepo {
 					.filter { it.status != AccountStatus.PENDING && it.role != Role.ADMIN }
 				trySend(list)
 			}
+
 			override fun onCancelled(error: DatabaseError) {
 				close(error.toException())
 			}
@@ -160,4 +165,36 @@ class AlumniRepoRealImpl : AlumniRepo {
 		)
 		dbRef.child(uid).updateChildren(updates).await()
 	}
+
+	override suspend fun addExtendedInfo(extendedInfo: ExtendedInfo) {
+		dbRefExtended.child(extendedInfo.uid).setValue(extendedInfo).await()
+	}
+
+	// TODO: for reference, delete later
+//	override suspend fun getAlumniByUid(uid: String): Alumni? {
+//		return dbRef.child(uid)
+//			.get()
+//			.await()
+//			.getValue(Alumni::class.java)
+//	}
+
+	override suspend fun getExtendedInfo(uid: String): ExtendedInfo? {
+		val result = dbRefExtended.child(uid)
+			.get()
+			.await()
+			.getValue(ExtendedInfo::class.java)
+//		Log.d("debugging", "getExtendedInfo for uid=$uid: $result")
+		return result
+	}
+
+	// TODO: probably remove
+	override suspend fun uploadProfilePhoto(uid: String, imageUri: Uri) {
+		Log.d("debugging", "uploadProfilePhoto trigger?")
+//		val fileName = "profile_${uid}_${UUID.randomUUID()}.jpg"
+//		val storageRef = dbRefExtended.ref
+//		val imageRef = storageRef.child("profile_photos/$uid/$fileName")
+
+//		imageRef.putFile
+	}
 }
+

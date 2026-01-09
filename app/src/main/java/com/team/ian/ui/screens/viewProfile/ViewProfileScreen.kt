@@ -48,6 +48,7 @@ fun ViewProfileScreen(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding(16.dp)
+			.verticalScroll(rememberScrollState()),
 	) {
 		Card(
 			modifier = Modifier.fillMaxWidth(),
@@ -57,8 +58,7 @@ fun ViewProfileScreen(
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(24.dp)
-					.verticalScroll(rememberScrollState()),
+					.padding(24.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				// Profile Photo
