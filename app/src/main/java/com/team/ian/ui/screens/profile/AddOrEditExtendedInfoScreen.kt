@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.profile
 
+import android.R
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +23,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Work
@@ -32,8 +37,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,48 +53,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.ui.screens.utils.setRefresh
+import kotlin.text.set
 
 @Composable
 fun AddOrEditExtendedInfoScreen(navController: NavController) {
 	val viewModel: AddOrEditExtendedInfoViewModel = viewModel()
-	var selectedImageUri by remember { mutableStateOf<Uri?>(null) } // Stores the Uri of the selected image (uri from gallery)
-	var loadedBitmap by remember { mutableStateOf<Bitmap?>(null) } // Stores the actual bitmap after loading
-	var isLoading by remember { mutableStateOf(false) }
-	var loadError by remember { mutableStateOf(false) }
+	val extendedInfo by viewModel.extendedInfo.collectAsStateWithLifecycle()
 	var shortBio by remember { mutableStateOf("") }
 	var skills by remember { mutableStateOf(listOf("")) }
 	var pastJobHistory by remember { mutableStateOf(listOf("")) }
-	val context = LocalContext.current
 
-	// TODO: Remove this and decide on storage of image or no storage
-//	LaunchedEffect(selectedImageUri) { // Runs when selectedImageUri changes
-//		selectedImageUri?.let { uri ->
-//			isLoading = true
-//			loadError = false
-//			loadedBitmap = withContext(Dispatchers.IO) { // Loads bitmap on the background thread
-//				try {
-//					context.contentResolver.openInputStream(uri)?.use { inputStream -> // Reads image file using the uri
-//						BitmapFactory.decodeStream(inputStream) // Converts stream to bitmap object
-//					}
-//				} catch (e: Exception) {
-//					Log.e("debugging", "Error loading bitmap ${e.message}")
-//					loadError = true
-//					null
-//				} finally {
-//					isLoading = false
-//				}
-//			}
-//		} ?: run {
-//			loadedBitmap = null
-//			isLoading = false
-//			loadError = false
-//		}
-//	}
+	// Populate form fields when extendedInfo is loaded
+	LaunchedEffect(extendedInfo) {
+		extendedInfo?.let { info ->
+			shortBio = info.shortBio
+			skills = if (info.skills.isNotEmpty()) info.skills else listOf("")
+			pastJobHistory = if (info.pastJobHistory.isNotEmpty()) info.pastJobHistory else listOf("")
+		}
+	}
 
+	// Handle navigation on finish
 	LaunchedEffect(Unit) {
 		viewModel.finish.collect {
 			setRefresh(navController)
@@ -94,7 +86,7 @@ fun AddOrEditExtendedInfoScreen(navController: NavController) {
 		}
 	}
 
-	fun complete() {
+	fun finishEdit() {
 		viewModel.addExtendedInfoToAlumni(
 			pastJobHistory,
 			skills,
@@ -102,193 +94,36 @@ fun AddOrEditExtendedInfoScreen(navController: NavController) {
 		)
 	}
 
-
-	val imagePickerLauncher = rememberLauncherForActivityResult(
-		contract = ActivityResultContracts.GetContent() // Opens device gallery
-	) { uri: Uri? -> // Returns a uri pointing to selected image
-		uri?.let { selectedImageUri = it }
-	}
-
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(25.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		Card(
+		Text(
+			modifier = Modifier.padding(start=16.dp,top = 20.dp, bottom=5.dp),
+			text = "Edit Extended Profile",
+			style = MaterialTheme.typography.headlineMedium,
+			fontWeight = FontWeight.Bold,
+			color = MaterialTheme.colorScheme.primary,
+		)
+
+		Column(
 			modifier = Modifier
-				.fillMaxWidth()
-				.padding(bottom = 16.dp),
-			elevation = CardDefaults.cardElevation(4.dp),
-			shape = RoundedCornerShape(16.dp)
+				.weight(1f)
+				.verticalScroll(rememberScrollState())
+				.padding(16.dp),
+			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-			Column(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(24.dp),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.Center
+			Card(
+				modifier = Modifier.fillMaxWidth(),
+				elevation = CardDefaults.cardElevation(4.dp),
+				shape = RoundedCornerShape(12.dp),
 			) {
-				Box(
-					modifier = Modifier.size(150.dp),
-					contentAlignment = Alignment.Center
-				) {
-					when {
-						isLoading -> {
-							Box(
-								modifier = Modifier
-									.size(150.dp)
-									.clip(CircleShape)
-									.background(MaterialTheme.colorScheme.surfaceVariant),
-								contentAlignment = Alignment.Center
-							) {
-								CircularProgressIndicator()
-							}
-						}
-						loadError -> {
-							Box(
-								modifier = Modifier
-									.size(150.dp)
-									.clip(CircleShape)
-									.background(MaterialTheme.colorScheme.errorContainer),
-								contentAlignment = Alignment.Center
-							) {
-								Column(horizontalAlignment = Alignment.CenterHorizontally) {
-									Icon(
-										Icons.Default.Error,
-										contentDescription = "Error",
-										modifier = Modifier.size(48.dp),
-										tint = MaterialTheme.colorScheme.error
-									)
-									Text(
-										"Failed to load",
-										style = MaterialTheme.typography.bodySmall,
-										modifier = Modifier.padding(top = 4.dp)
-									)
-								}
-							}
-						}
-						loadedBitmap != null -> {
-							Image(
-								bitmap = loadedBitmap!!.asImageBitmap(),
-								contentDescription = "Profile photo",
-								modifier = Modifier
-									.size(150.dp)
-									.clip(CircleShape)
-							)
-						}
-						else -> {
-							Box(
-								modifier = Modifier
-									.size(150.dp)
-									.clip(CircleShape)
-									.background(
-										MaterialTheme.colorScheme.surfaceVariant,
-										CircleShape
-									),
-								contentAlignment = Alignment.Center
-							) {
-								Column(horizontalAlignment = Alignment.CenterHorizontally) {
-									Icon(
-										imageVector = Icons.Default.Person,
-										contentDescription = "No profile photo",
-										modifier = Modifier.size(64.dp),
-										tint = MaterialTheme.colorScheme.onSurfaceVariant
-									)
-									Text(
-										"No image selected",
-										style = MaterialTheme.typography.labelSmall,
-										modifier = Modifier.padding(top = 4.dp)
-									)
-								}
-							}
-						}
-					}
-				}
-
-				Spacer(modifier = Modifier.height(16.dp))
-
-				if (selectedImageUri != null && !isLoading) {
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
-						modifier = Modifier.padding(bottom = 8.dp)
-					) {
-						if (loadedBitmap != null) {
-							Icon(
-								Icons.Default.Check,
-								contentDescription = "Loaded",
-								tint = MaterialTheme.colorScheme.primary
-							)
-							Text(
-								"Image loaded successfully",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.primary
-							)
-						} else if (loadError) {
-							Icon(
-								Icons.Default.Error,
-								contentDescription = "Error",
-								tint = MaterialTheme.colorScheme.error
-							)
-							Text(
-								"Failed to load image",
-								style = MaterialTheme.typography.bodySmall,
-								color = MaterialTheme.colorScheme.error
-							)
-						}
-					}
-				}
-				Column(
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(8.dp)
-				) {
-					Button(
-						onClick = { imagePickerLauncher.launch("image/*") },
-						modifier = Modifier.fillMaxWidth(),
-						enabled = !isLoading
-					) {
-						Text(if (selectedImageUri != null) "Change Image" else "Select Profile Image")
-					}
-					if (selectedImageUri != null) {
-						Button(
-							onClick = {
-								selectedImageUri = null
-								loadedBitmap = null
-								loadError = false
-							},
-							modifier = Modifier.fillMaxWidth(),
-							colors = ButtonDefaults.buttonColors(
-								containerColor = MaterialTheme.colorScheme.errorContainer,
-								contentColor = MaterialTheme.colorScheme.onErrorContainer
-							)
-						) {
-							Text("Clear Image")
-						}
-					}
-				}
-			}
-		}
-
-		Card(
-			modifier = Modifier
-				.fillMaxWidth()
-				.weight(1f),
-			elevation = CardDefaults.cardElevation(4.dp),
-			shape = RoundedCornerShape(16.dp)
-		) {
-			Column(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(24.dp)
-					.verticalScroll(rememberScrollState()),
-				verticalArrangement = Arrangement.spacedBy(16.dp)
-			) {
-				Column {
+				Column(modifier = Modifier.padding(16.dp)) {
 					Text(
 						"Short Bio",
 						style = MaterialTheme.typography.titleMedium,
-						modifier = Modifier.padding(bottom = 8.dp)
+						color = MaterialTheme.colorScheme.primary,
+						modifier = Modifier.padding(bottom = 12.dp)
 					)
 					OutlinedTextField(
 						value = shortBio,
@@ -299,91 +134,223 @@ fun AddOrEditExtendedInfoScreen(navController: NavController) {
 						minLines = 5
 					)
 				}
-				Column {
-					Text(
-						"Past Job History",
-						style = MaterialTheme.typography.titleMedium,
-						modifier = Modifier.padding(bottom = 8.dp)
-					)
-					pastJobHistory.forEachIndexed { index, job ->
-						OutlinedTextField(
-							value = job,
-							onValueChange = {
+			}
+
+			// Past Job History Section
+			Card(
+				modifier = Modifier.fillMaxWidth(),
+				elevation = CardDefaults.cardElevation(2.dp),
+				shape = RoundedCornerShape(12.dp),
+			) {
+				Column(modifier = Modifier.padding(16.dp)) {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Text(
+							"Past Job History",
+							style = MaterialTheme.typography.titleMedium,
+							color = MaterialTheme.colorScheme.primary
+						)
+						OutlinedButton(
+							onClick = {
 								val updatedList = pastJobHistory.toMutableList()
-								updatedList[index] = it
+								updatedList.add("")
 								pastJobHistory = updatedList
 							},
+							modifier = Modifier.height(36.dp)
+						) {
+							Icon(
+								Icons.Default.Add,
+								contentDescription = "Add job",
+								modifier = Modifier.size(18.dp)
+							)
+							Spacer(modifier = Modifier.size(4.dp))
+							Text("Add")
+						}
+					}
+
+					Spacer(modifier = Modifier.height(12.dp))
+
+					if (pastJobHistory.isEmpty()) {
+						Box(
 							modifier = Modifier
 								.fillMaxWidth()
-								.padding(bottom = 8.dp),
-							placeholder = { Text("Job Title & Description") },
-							leadingIcon = {
-								Icon(
-									Icons.Default.Work,
-									contentDescription = "job title/description"
+								.padding(vertical = 16.dp),
+							contentAlignment = Alignment.Center
+						) {
+							Text(
+								"No job entries yet. Click 'Add' to get started.",
+								style = MaterialTheme.typography.bodyMedium,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+					} else {
+						pastJobHistory.forEachIndexed { index, job ->
+							Row(
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(bottom = 8.dp),
+								horizontalArrangement = Arrangement.spacedBy(8.dp)
+							) {
+								OutlinedTextField(
+									value = job,
+									onValueChange = {
+										val updatedList = pastJobHistory.toMutableList()
+										updatedList[index] = it
+										pastJobHistory = updatedList
+									},
+									modifier = Modifier.weight(1f),
+									placeholder = { Text("Job Title & Company") },
+									leadingIcon = {
+										Icon(
+											Icons.Default.Work,
+											contentDescription = "job"
+										)
+									},
+									shape = RoundedCornerShape(12.dp),
+									singleLine = true
 								)
-							},
-							shape = RoundedCornerShape(12.dp),
-							singleLine = true
-						)
-					}
-					Button(
-						onClick = {
-							val updatedList = pastJobHistory.toMutableList()
-							updatedList.add("")
-							pastJobHistory = updatedList
-						},
-						modifier = Modifier.fillMaxWidth()
-					) {
-						Text("Add Job Entry")
+								if (pastJobHistory.size > 1) {
+									OutlinedButton(
+										onClick = {
+											val updatedList = pastJobHistory.toMutableList()
+											updatedList.removeAt(index)
+											pastJobHistory = updatedList
+										},
+										modifier = Modifier.size(56.dp),
+										shape = RoundedCornerShape(12.dp),
+										colors = ButtonDefaults.outlinedButtonColors(
+											contentColor = MaterialTheme.colorScheme.error
+										)
+									) {
+										Icon(
+											Icons.Default.Delete,
+											contentDescription = "Remove",
+											modifier = Modifier.size(20.dp)
+										)
+									}
+								}
+							}
+						}
 					}
 				}
-				Column {
-					Text(
-						"Skills",
-						style = MaterialTheme.typography.titleMedium,
-						modifier = Modifier.padding(bottom = 8.dp)
-					)
-					skills.forEachIndexed { index, skill ->
-						OutlinedTextField(
-							value = skill,
-							onValueChange = {
+			}
+
+			// Skills Section
+			Card(
+				modifier = Modifier.fillMaxWidth(),
+				elevation = CardDefaults.cardElevation(2.dp),
+				shape = RoundedCornerShape(12.dp),
+			) {
+				Column(modifier = Modifier.padding(16.dp)) {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Text(
+							"Skills",
+							style = MaterialTheme.typography.titleMedium,
+							color = MaterialTheme.colorScheme.primary
+						)
+						OutlinedButton(
+							onClick = {
 								val updatedList = skills.toMutableList()
-								updatedList[index] = it
+								updatedList.add("")
 								skills = updatedList
 							},
+							modifier = Modifier.height(36.dp)
+						) {
+							Icon(
+								Icons.Default.Add,
+								contentDescription = "Add skill",
+								modifier = Modifier.size(18.dp)
+							)
+							Spacer(modifier = Modifier.size(4.dp))
+							Text("Add")
+						}
+					}
+
+					Spacer(modifier = Modifier.height(12.dp))
+
+					if (skills.isEmpty()) {
+						Box(
 							modifier = Modifier
 								.fillMaxWidth()
-								.padding(bottom = 8.dp),
-							placeholder = { Text("Enter a skill") },
-							shape = RoundedCornerShape(12.dp),
-							singleLine = true
-						)
-					}
-					Button(
-						onClick = {
-							val updatedList = skills.toMutableList()
-							updatedList.add("")
-							skills = updatedList
-						},
-						modifier = Modifier.fillMaxWidth()
-					) {
-						Text("Add Skill Entry")
+								.padding(vertical = 16.dp),
+							contentAlignment = Alignment.Center
+						) {
+							Text(
+								"No skills yet. Click 'Add' to get started.",
+								style = MaterialTheme.typography.bodyMedium,
+								color = MaterialTheme.colorScheme.onSurfaceVariant
+							)
+						}
+					} else {
+						skills.forEachIndexed { index, skill ->
+							Row(
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(bottom = 8.dp),
+								horizontalArrangement = Arrangement.spacedBy(8.dp)
+							) {
+								OutlinedTextField(
+									value = skill,
+									onValueChange = {
+										val updatedList = skills.toMutableList()
+										updatedList[index] = it
+										skills = updatedList
+									},
+									modifier = Modifier.weight(1f),
+									placeholder = { Text("Enter a skill") },
+									shape = RoundedCornerShape(12.dp),
+									singleLine = true
+								)
+								if (skills.size > 1) {
+									OutlinedButton(
+										onClick = {
+											val updatedList = skills.toMutableList()
+											updatedList.removeAt(index)
+											skills = updatedList
+										},
+										modifier = Modifier.size(56.dp),
+										shape = RoundedCornerShape(12.dp),
+										colors = ButtonDefaults.outlinedButtonColors(
+											contentColor = MaterialTheme.colorScheme.error
+										)
+									) {
+										Icon(
+											Icons.Default.Delete,
+											contentDescription = "Remove",
+											modifier = Modifier.size(20.dp)
+										)
+									}
+								}
+							}
+						}
 					}
 				}
 			}
 		}
 
-		Box(Modifier.fillMaxWidth().padding(16.dp)){
-			Button(
-				onClick = { complete() },
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(50.dp)
-			) {
-				Text("Complete Profile")
-			}
+		// Bottom Button
+		Button(
+			onClick = { finishEdit() },
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(16.dp)
+				.height(56.dp),
+			shape = RoundedCornerShape(12.dp)
+		) {
+			Icon(
+				Icons.Default.Check,
+				contentDescription = null,
+				modifier = Modifier.size(20.dp)
+			)
+			Spacer(modifier = Modifier.size(8.dp))
+			Text("Save changes", style = MaterialTheme.typography.titleMedium)
 		}
-
 	}
 }

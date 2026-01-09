@@ -23,10 +23,12 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,12 +44,30 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
 fun ExtendedInfoScreen(navController: NavController) {
 	val viewModel: ExtendedInfoViewModel = viewModel()
 	val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
+
+	// Listen for refresh signal from edit screen
+	LaunchedEffect(Unit) {
+		navController.currentBackStackEntry
+			?.savedStateHandle
+			?.getStateFlow("refresh", false)
+			?.collect { shouldRefresh ->
+				if (shouldRefresh) {
+					viewModel.getExtendedInfo()
+					// Reset the flag
+					navController.currentBackStackEntry
+						?.savedStateHandle
+						?.set("refresh", false)
+				}
+			}
+	}
 
 	Column(
 		modifier = Modifier
@@ -135,13 +155,56 @@ fun ExtendedInfoScreen(navController: NavController) {
 			Column(
 				verticalArrangement = Arrangement.spacedBy(16.dp)
 			) {
-				extendedInfo.pastJobHistory.filter { it.isNotBlank() }.forEachIndexed { index, job ->
-					JobHistoryItem(
-						job = job,
-						isFirst = index == 0,
-						isLast = index == extendedInfo.pastJobHistory.size - 1
-					)
-				}
+				extendedInfo.pastJobHistory.filter { it.isNotBlank() }
+					.forEachIndexed { index, job ->
+						JobHistoryItem(
+							job = job,
+							isFirst = index == 0,
+							isLast = index == extendedInfo.pastJobHistory.size - 1
+						)
+					}
+			}
+		}
+
+		Spacer(Modifier.height(16.dp))
+
+		Row(
+			Modifier
+				.fillMaxWidth()
+				.padding(16.dp),
+			horizontalArrangement = Arrangement.spacedBy(5.dp)
+
+		) {
+			Button(
+				onClick = {
+					navController.navigate(Screen.AddOrEditExtendedInfo)
+				},
+				modifier = Modifier
+					.weight(1f)
+					.height(50.dp),
+				shape = RoundedCornerShape(12.dp)
+			) {
+				Text(
+					text = "Edit",
+					style = MaterialTheme.typography.bodyLarge,
+					fontWeight = FontWeight.Bold
+				)
+			}
+			OutlinedButton(
+				onClick = {
+					setRefresh(navController)
+					navController.popBackStack()
+				},
+				modifier = Modifier
+					.weight(1f)
+					.height(50.dp),
+				shape = RoundedCornerShape(12.dp)
+			) {
+				Text(
+					text = "Back",
+					style = MaterialTheme.typography.bodyLarge,
+					fontWeight = FontWeight.Bold
+				)
 			}
 		}
 	}
@@ -183,7 +246,6 @@ private fun ProfileSection(
 			}
 
 			Spacer(modifier = Modifier.height(12.dp))
-
 			content()
 		}
 	}

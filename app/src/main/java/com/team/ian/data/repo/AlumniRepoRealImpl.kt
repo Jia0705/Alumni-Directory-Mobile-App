@@ -170,11 +170,21 @@ class AlumniRepoRealImpl : AlumniRepo {
 		dbRefExtended.child(extendedInfo.uid).setValue(extendedInfo).await()
 	}
 
+	// TODO: for reference, delete later
+//	override suspend fun getAlumniByUid(uid: String): Alumni? {
+//		return dbRef.child(uid)
+//			.get()
+//			.await()
+//			.getValue(Alumni::class.java)
+//	}
+
 	override suspend fun getExtendedInfo(uid: String): ExtendedInfo? {
-		return dbRefExtended.child(uid)
+		val result = dbRefExtended.child(uid)
 			.get()
 			.await()
 			.getValue(ExtendedInfo::class.java)
+//		Log.d("debugging", "getExtendedInfo for uid=$uid: $result")
+		return result
 	}
 
 	// TODO: probably remove

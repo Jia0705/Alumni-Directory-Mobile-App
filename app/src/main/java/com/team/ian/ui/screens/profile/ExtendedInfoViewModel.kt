@@ -18,18 +18,31 @@ class ExtendedInfoViewModel(
 	private val _extendedInfo = MutableStateFlow(ExtendedInfo())
 	val extendedInfo = _extendedInfo.asStateFlow()
 
+	init {
+		getExtendedInfo()
+	}
+
 	fun getExtendedInfo(){
+		Log.d("debugging", "getExtendedInfo trigger")
 		viewModelScope.launch(Dispatchers.IO) {
 			try{
 				val userId = authService.getCurrentUser()?.id
-				userId?.let {
-					alumniRepo.getExtendedInfo(userId)?.let {
-						Log.d("debugging", it.toString())
-						_extendedInfo.value = it
-					}
+				if (userId == null) {
+					Log.e("debugging", "getExtendedInfo: userId is null - user not logged in?")
+					return@launch
+				}
+				
+				Log.d("debugging", "getExtendedInfo: fetching for userId=$userId")
+				val result = alumniRepo.getExtendedInfo(userId)
+				
+				if (result != null) {
+					Log.d("debugging", "getExtendedInfo: SUCCESS - $result")
+					_extendedInfo.value = result
+				} else {
+					Log.e("debugging", "getExtendedInfo: FAILED - returned null for userId=$userId")
 				}
 			}catch (e: Exception){
-				Log.d("debugging", e.toString())
+				Log.e("debugging", "getExtendedInfo: EXCEPTION - ${e.message}", e)
 			}
 		}
 	}
