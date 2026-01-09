@@ -28,6 +28,9 @@ data class Alumni(
     val phone: String = "",
     val photoURL: String = "",
 
+    // FCM token
+    val token: String = "",
+
     // Metadata
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
