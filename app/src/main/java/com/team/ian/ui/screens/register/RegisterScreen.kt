@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.register
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.data.model.Registration
 import com.team.ian.ui.navigation.Screen
 
@@ -47,6 +49,7 @@ fun RegisterScreen(
 
 	var page by remember { mutableIntStateOf(0) }
 	var registration by remember { mutableStateOf(Registration()) }
+	var extendedInfo by remember { mutableStateOf(ExtendedInfo()) }
 	var password by remember { mutableStateOf("") }
 
 	fun submitRegistration() {
@@ -62,6 +65,10 @@ fun RegisterScreen(
 				Toast.makeText(context, it, Toast.LENGTH_LONG).show()
 			}
 		)
+	}
+
+	fun submitExtendedInfo() {
+		Log.d("debugging", "yes")
 	}
 
 	Box(
@@ -127,8 +134,16 @@ fun RegisterScreen(
 						registration = registration,
 						onUpdate = { registration = it },
 						onSubmit = { submitRegistration() },
-						onBack = { page = 1 }
+						onNext = { page = 3 },
+						onBack = { page = 1 },
 					)
+
+//					3 -> ExtendedInfoPage(
+//						extendedInfo = extendedInfo,
+//						onUpdate = { extendedInfo = it },
+//						onSubmit = { submitExtendedInfo() },
+//						onBack = { page = 2 }
+//					)
 				}
 
 				Spacer(Modifier.height(24.dp))
@@ -141,7 +156,7 @@ fun RegisterScreen(
 						style = MaterialTheme.typography.bodyMedium
 					)
 					TextButton(
-						onClick = { 
+						onClick = {
 							navController.navigate(Screen.Login) {
 								popUpTo(Screen.Register) { inclusive = true }
 							}
@@ -336,8 +351,9 @@ fun ProfessionalInfoPage(
 fun LocationInfoPage(
 	registration: Registration,
 	onUpdate: (Registration) -> Unit,
+	onNext: () -> Unit,
 	onSubmit: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	Column(
 		modifier = Modifier.fillMaxWidth(),
@@ -398,62 +414,68 @@ fun LocationInfoPage(
 		) {
 			Text("Back")
 		}
+
+	}
+	Button(onClick = onNext) {
+		Text("Add Extra Info?")
+		Text("Addition Info: Past job history, Skills, Short bio")
 	}
 }
 
 //@Composable
-//fun AdditionalInfo(
-//    extendedInfo: ExtendedInfo,
-//    onUpdateData: (ExtendedInfo) -> Unit,
-//    onBack: () -> Unit
+//fun ExtendedInfoPage(
+//	extendedInfo: ExtendedInfo,
+//	onUpdate: (ExtendedInfo) -> Unit,
+//	onSubmit: () -> Unit,
+//	onBack: () -> Unit
 //) {
-//    Text("Past Job History")
-//    OutlinedTextField(
-//        value = extendedInfo.pastJobHistory,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(pastJobHistory = it)
-//            )
-//        }
-//    )
-//    Spacer(Modifier.padding(5.dp))
-//    Text("Skills")
-//    OutlinedTextField(
-//        value = extendedInfo.skills,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(skills = it)
-//            )
-//        }
-//    )
-//    Spacer(Modifier.padding(5.dp))
-//    Text("Short Bio")
-//    OutlinedTextField(
-//        value = extendedInfo.shortBio,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(shortBio = it)
-//            )
-//        }
-//    )
-//    Spacer(Modifier.padding(5.dp))
-//    Text("Profile Picture")
-//    OutlinedTextField(
-//        value = extendedInfo.profilePicUrl,
-//        onValueChange = {
-//            onUpdateData(
-//                extendedInfo.copy(profilePicUrl = it)
-//            )
-//        }
-//    )
-//    Spacer(modifier = Modifier.height(16.dp))
-//    Button(onClick = {}) {
-//        Text("Register")
-//    }
-//    Button(onClick = {
-//        onBack()
-//    }) {
-//        Text("Back")
-//    }
+//	Text("Past Job History")
+//	OutlinedTextField(
+//		value = extendedInfo.pastJobHistory,
+//		onValueChange = {
+//			onUpdate(
+//				extendedInfo.copy(extendedInfo.pastJobHistory = it)
+//			)
+//		}
+//	)
+//	Spacer(Modifier.padding(5.dp))
+//	Text("Skills")
+//	OutlinedTextField(
+//		value = extendedInfo.skills,
+//		onValueChange = {
+//			onUpdate(
+//				extendedInfo.copy(extendedInfo.skills = it)
+//			)
+//		}
+//	)
+//	Spacer(Modifier.padding(5.dp))
+//	Text("Short Bio")
+//	OutlinedTextField(
+//		value = extendedInfo.shortBio,
+//		onValueChange = {
+//			onUpdate(
+//				extendedInfo.copy(extendedInfo.shortBio = it)
+//			)
+//		}
+//	)
+//	Spacer(Modifier.padding(5.dp))
+//	Text("Profile Picture")
+//	OutlinedTextField(
+//		value = extendedInfo.profilePicUrl,
+//		onValueChange = {
+//			onUpdateData(
+//				extendedInfo.copy(profilePicUrl = it)
+//			)
+//		}
+//	)
+//	Spacer(modifier = Modifier.height(16.dp))
+//	Button(onClick = {}) {
+//		Text("Register")
+//	}
+//	Button(onClick = {
+//		onBack()
+//	}) {
+//		Text("Back")
+//	}
 //}
 

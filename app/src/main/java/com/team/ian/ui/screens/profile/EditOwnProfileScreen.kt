@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.profile
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -29,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.components.InfoTextField
 import com.team.ian.data.model.AlumniField
+import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
@@ -37,6 +40,7 @@ fun EditOwnProfileScreen(
 ) {
 	val viewModel: EditOwnProfileViewModel = viewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
+	val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
 
 	LaunchedEffect(Unit) {
 		viewModel.finish.collect {
@@ -171,8 +175,26 @@ fun EditOwnProfileScreen(
 				HorizontalDivider()
 				Spacer(Modifier.height(16.dp))
 
+				TextButton(onClick = {
+					if (extendedInfo) {
+						navController.navigate(
+							Screen.ExtendedInfo
+						)
+					} else {
+						navController.navigate(
+							Screen.AddOrEditExtendedInfo
+						)
+					}
+				}) {
+					if (extendedInfo) {
+						Text("View extended information")
+					} else {
+						Text("Add Extended information to your profile")
+					}
+				}
 
-				// Buttons
+				Spacer(Modifier.height(16.dp))
+
 				Row(
 					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.spacedBy(12.dp)
