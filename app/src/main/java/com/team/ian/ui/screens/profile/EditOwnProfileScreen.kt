@@ -45,12 +45,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.team.ian.components.InfoTextField
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
+import com.team.ian.ui.components.InfoTextField
 import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
 
@@ -89,7 +90,7 @@ fun EditOwnProfileScreen(
 		}
 	}
 
-	Box(
+	Column(
 		modifier = Modifier
 			.fillMaxSize()
 	) {
