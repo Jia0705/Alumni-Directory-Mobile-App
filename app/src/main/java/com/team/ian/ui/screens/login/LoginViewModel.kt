@@ -20,7 +20,7 @@ class LoginViewModel(
 				authService.loginWithEmail(email, password)
 				onSuccess()
 			} catch (e: Exception) {
-				onError(e.message ?: "Login failed")
+				onError("Email or password is incorrect")
 			}
 		}
 	}

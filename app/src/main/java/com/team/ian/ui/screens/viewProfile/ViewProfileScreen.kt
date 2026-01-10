@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -163,21 +164,54 @@ fun ViewProfileScreen(
                     InfoRow("Country", alumni.country, Icons.Filled.Email)
                 }
 
-                if (alumni.linkedin.isNotBlank() || alumni.github.isNotBlank()) {
+                if (
+                    (alumni.showLinkedIn && alumni.linkedin.isNotBlank()) ||
+                    (alumni.showGithub && alumni.github.isNotBlank()) ||
+                    (alumni.showPhone && alumni.phone.isNotBlank())
+                ) {
                     Spacer(Modifier.height(16.dp))
                     HorizontalDivider()
                     Spacer(Modifier.height(16.dp))
 
-                    // Links
+                    // Contact Methods
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        if (alumni.linkedin.isNotBlank()) {
+                        if (alumni.showLinkedIn && alumni.linkedin.isNotBlank()) {
                             InfoRow("LinkedIn", alumni.linkedin, Icons.Filled.Email)
                         }
-                        if (alumni.github.isNotBlank()) {
+                        if (alumni.showGithub && alumni.github.isNotBlank()) {
                             InfoRow("GitHub", alumni.github, Icons.Filled.Email)
+                        }
+                        if (alumni.showPhone && alumni.phone.isNotBlank()) {
+                            InfoRow("Phone", alumni.phone, Icons.Filled.Phone)
+                        }
+                    }
+                }
+
+                if (
+                    alumni.shortBio.isNotBlank() ||
+                    alumni.skills.isNotEmpty() ||
+                    alumni.pastJobHistory.isNotEmpty()
+                ) {
+                    Spacer(Modifier.height(16.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(16.dp))
+
+                    // Extended Info
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        if (alumni.shortBio.isNotBlank()) {
+                            InfoRow("About", alumni.shortBio, Icons.Filled.Email)
+                        }
+                        if (alumni.skills.isNotEmpty()) {
+                            InfoRow("Skills", alumni.skills.joinToString(", "), Icons.Filled.Email)
+                        }
+                        if (alumni.pastJobHistory.isNotEmpty()) {
+                            InfoRow("Work Experience", alumni.pastJobHistory.joinToString(", "), Icons.Filled.Email)
                         }
                     }
                 }

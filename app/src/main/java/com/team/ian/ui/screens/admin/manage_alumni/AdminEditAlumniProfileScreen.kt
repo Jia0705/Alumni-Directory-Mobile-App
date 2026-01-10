@@ -204,6 +204,74 @@ fun AdminEditAlumniProfileScreen(
 					}
 				)
 
+				Spacer(Modifier.height(16.dp))
+				HorizontalDivider()
+				Spacer(Modifier.height(16.dp))
+
+				Text(
+					text = "Contact Methods",
+					style = MaterialTheme.typography.titleMedium,
+					fontWeight = FontWeight.Bold
+				)
+
+				Spacer(Modifier.height(12.dp))
+
+				InfoTextField(
+					label = "LinkedIn",
+					value = alumni.linkedin,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.LINKEDIN, it)
+					}
+				)
+				InfoTextField(
+					label = "GitHub",
+					value = alumni.github,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.GITHUB, it)
+					}
+				)
+				InfoTextField(
+					label = "Phone",
+					value = alumni.phone,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.PHONE, it)
+					}
+				)
+
+				Spacer(Modifier.height(16.dp))
+				HorizontalDivider()
+				Spacer(Modifier.height(16.dp))
+
+				Text(
+					text = "Extended Info",
+					style = MaterialTheme.typography.titleMedium,
+					fontWeight = FontWeight.Bold
+				)
+
+				Spacer(Modifier.height(12.dp))
+
+				InfoTextField(
+					label = "About / Bio",
+					value = alumni.shortBio,
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.SHORT_BIO, it)
+					}
+				)
+				InfoTextField(
+					label = "Skills (comma separated)",
+					value = alumni.skills.joinToString(", "),
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.SKILLS, it)
+					}
+				)
+				InfoTextField(
+					label = "Work Experience (comma separated)",
+					value = alumni.pastJobHistory.joinToString(", "),
+					onValueChange = {
+						viewModel.updateAlumniField(AlumniField.PAST_JOB_HISTORY, it)
+					}
+				)
+
 				HorizontalDivider()
 				Spacer(Modifier.height(16.dp))
 
