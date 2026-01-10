@@ -34,6 +34,21 @@ class AlumniRepoRealImpl : AlumniRepo {
 			.getValue(Alumni::class.java)
 	}
 
+	override fun getAllUsers(): Flow<List<Alumni>> = callbackFlow {
+		val listener = object : ValueEventListener {
+			override fun onDataChange(snapshot: DataSnapshot) {
+				val list = snapshot.children
+					.mapNotNull { it.getValue(Alumni::class.java) }
+				trySend(list)
+			}
+			override fun onCancelled(error: DatabaseError) {
+				close(error.toException())
+			}
+		}
+		dbRef.addValueEventListener(listener)
+		awaitClose { dbRef.removeEventListener(listener) }
+	}
+
 	override fun getAllAlumniExceptForPending(): Flow<List<Alumni>> = callbackFlow {
 		val listener = object : ValueEventListener {
 			override fun onDataChange(snapshot: DataSnapshot) {
@@ -115,7 +130,7 @@ class AlumniRepoRealImpl : AlumniRepo {
 			override fun onDataChange(snapshot: DataSnapshot) {
 				val list = snapshot.children
 					.mapNotNull { it.getValue(Alumni::class.java) }
-					.filter { it.status == AccountStatus.INACTIVE }
+					.filter { it.status == AccountStatus.REJECTED }
 
 				trySend(list)
 			}

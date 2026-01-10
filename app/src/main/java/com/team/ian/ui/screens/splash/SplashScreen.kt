@@ -69,6 +69,10 @@ fun SplashScreen(
 				navigate(navController, Screen.Rejected)
 			}
 
+			alumni.status == AccountStatus.INACTIVE -> {
+				navigate(navController, Screen.Inactive)
+			}
+
 			alumni.status == AccountStatus.APPROVED -> {
 				navigate(navController, Screen.Home)
 			}

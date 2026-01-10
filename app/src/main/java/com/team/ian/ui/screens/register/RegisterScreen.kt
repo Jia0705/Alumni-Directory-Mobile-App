@@ -75,7 +75,7 @@ fun RegisterScreen(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding(16.dp),
-		contentAlignment = Alignment.TopCenter
+		contentAlignment = Alignment.Center
 	) {
 		Card(
 			modifier = Modifier.fillMaxWidth(),

@@ -57,7 +57,7 @@ class IanFirebaseMessagingService: FirebaseMessagingService() {
 		val channelId = "ian_alumni_notifications"
 		val channelName = "Alumni Directory Notifications"
 		
-		// Create notification channel (required for Android O+)
+		// Create notification channel
 		val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 		val channel = NotificationChannel(
 			channelId,
