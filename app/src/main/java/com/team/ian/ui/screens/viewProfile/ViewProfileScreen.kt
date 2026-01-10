@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.team.ian.ui.components.InfoRow
 
 @Composable
 fun ViewProfileScreen(
@@ -132,9 +134,9 @@ fun ViewProfileScreen(
 					modifier = Modifier.fillMaxWidth(),
 					verticalArrangement = Arrangement.spacedBy(12.dp)
 				) {
-					InfoRow("Job Title", alumni.jobTitle)
-					InfoRow("Company", alumni.company)
-					InfoRow("Tech Stack", alumni.primaryStack)
+					InfoRow("Job Title", alumni.jobTitle, Icons.Filled.Email)
+					InfoRow("Company", alumni.company, Icons.Filled.Email)
+					InfoRow("Tech Stack", alumni.primaryStack, Icons.Filled.Email)
 				}
 
 				Spacer(Modifier.height(16.dp))
@@ -146,8 +148,8 @@ fun ViewProfileScreen(
 					modifier = Modifier.fillMaxWidth(),
 					verticalArrangement = Arrangement.spacedBy(12.dp)
 				) {
-					InfoRow("City", alumni.city)
-					InfoRow("Country", alumni.country)
+					InfoRow("City", alumni.city, Icons.Filled.Email)
+					InfoRow("Country", alumni.country, Icons.Filled.Email)
 				}
 
 				if (alumni.linkedin.isNotBlank() || alumni.github.isNotBlank()) {
@@ -161,29 +163,14 @@ fun ViewProfileScreen(
 						verticalArrangement = Arrangement.spacedBy(12.dp)
 					) {
 						if (alumni.linkedin.isNotBlank()) {
-							InfoRow("LinkedIn", alumni.linkedin)
+                            InfoRow("LinkedIn", alumni.linkedin, Icons.Filled.Email)
 						}
 						if (alumni.github.isNotBlank()) {
-							InfoRow("GitHub", alumni.github)
+							InfoRow("GitHub", alumni.github, Icons.Filled.Email)
 						}
 					}
 				}
 			}
 		}
-	}
-}
-
-@Composable
-fun InfoRow(label: String, value: String) {
-	Column(modifier = Modifier.padding(vertical = 4.dp)) {
-		Text(
-			text = label,
-			style = MaterialTheme.typography.labelMedium,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
-		)
-		Text(
-			text = value.ifBlank { "-" },
-			style = MaterialTheme.typography.bodyLarge
-		)
 	}
 }

@@ -39,7 +39,7 @@ import androidx.activity.compose.BackHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.team.ian.components.InfoTextField
+import com.team.ian.ui.components.InfoTextField
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
