@@ -68,6 +68,13 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 			AlumniField.LINKEDIN -> current.copy(linkedin = value)
 			AlumniField.GITHUB -> current.copy(github = value)
 			AlumniField.PHONE -> current.copy(phone = value)
+			AlumniField.SHORT_BIO -> current.copy(shortBio = value)
+			AlumniField.SKILLS -> current.copy(
+				skills = value.split(",").map { it.trim() }.filter { it.isNotBlank() }
+			)
+			AlumniField.PAST_JOB_HISTORY -> current.copy(
+				pastJobHistory = value.split(",").map { it.trim() }.filter { it.isNotBlank() }
+			)
 		}
 		_alumni.value = updated
 	}
@@ -111,6 +118,12 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 					"primaryStack" to updatedAlumni.primaryStack,
 					"city" to updatedAlumni.city,
 					"country" to updatedAlumni.country,
+					"linkedin" to updatedAlumni.linkedin,
+					"github" to updatedAlumni.github,
+					"phone" to updatedAlumni.phone,
+					"shortBio" to updatedAlumni.shortBio,
+					"skills" to updatedAlumni.skills,
+					"pastJobHistory" to updatedAlumni.pastJobHistory,
 					"status" to updatedAlumni.status
 				)
 				alumniRepo.updateProfile(alumniId, updates)

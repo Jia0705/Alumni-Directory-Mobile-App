@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.Alumni
+import com.team.ian.data.model.Role
 import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.service.AuthService
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,7 @@ class HomeViewModel (
 				val currentUserId = authService.getCurrentUser()?.id
 				alumniRepo.getApprovedAlumni().collect { allAlumni ->
 					// Filter out current user's profile
-					val filtered = allAlumni.filter { it.uid != currentUserId }
+					val filtered = allAlumni.filter { it.uid != currentUserId && it.role != Role.ADMIN }
 					_allAlumni.value = filtered
 					
 					// Update filters
