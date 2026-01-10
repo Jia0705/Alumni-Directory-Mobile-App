@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.team.ian.components.InfoTextField
+import com.team.ian.ui.components.InfoTextField
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.AlumniField
 import com.team.ian.ui.screens.utils.setRefresh

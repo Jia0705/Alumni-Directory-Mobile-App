@@ -2,6 +2,7 @@ package com.team.ian.data.repo
 
 import android.net.Uri
 import com.team.ian.data.model.Alumni
+import com.team.ian.data.model.ContactLinks
 import com.team.ian.data.model.ExtendedInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -21,6 +22,10 @@ interface AlumniRepo {
 	suspend fun addExtendedInfo(extendedInfo: ExtendedInfo)
 	suspend fun getExtendedInfo(uid: String): ExtendedInfo?
 
+    suspend fun addContactLinks(contactLinks: ContactLinks)
+    suspend fun getContactLinks(uid:String): ContactLinks?
+
+    // TODO: remove or update
 	suspend fun uploadProfilePhoto(uid: String, imageUri: Uri)
 
 	companion object {

@@ -28,9 +28,7 @@ class MainActivity : ComponentActivity() {
 		requestNotificationPermission()
 		
 		setContent {
-			IANTheme {
-				ComposeApp()
-			}
+            ComposeApp()
 		}
 	}
 

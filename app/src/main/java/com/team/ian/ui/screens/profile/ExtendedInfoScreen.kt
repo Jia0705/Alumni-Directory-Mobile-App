@@ -1,7 +1,5 @@
 package com.team.ian.ui.screens.profile
 
-import android.graphics.Bitmap
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,9 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Button
@@ -32,19 +33,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.team.ian.ui.components.ProfileSection
 import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
 
@@ -72,181 +69,149 @@ fun ExtendedInfoScreen(navController: NavController) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.background(MaterialTheme.colorScheme.background)
-			.verticalScroll(rememberScrollState())
 	) {
-		Card(
+		Text(
+			modifier = Modifier.padding(start = 16.dp, top = 35.dp, bottom = 5.dp),
+			text = "Extended Profile",
+			style = MaterialTheme.typography.headlineLarge,
+			fontWeight = FontWeight.Bold,
+			color = MaterialTheme.colorScheme.primary,
+		)
+		Text(
+			modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+			text = "View your complete professional profile information",
+			style = MaterialTheme.typography.bodyLarge,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+		)
+		Column(
 			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 25.dp, vertical = 16.dp),
-			elevation = CardDefaults.cardElevation(4.dp),
-			shape = RoundedCornerShape(16.dp)
+				.weight(1f)
+				.verticalScroll(rememberScrollState())
+				.padding(horizontal = 16.dp),
+			verticalArrangement = Arrangement.spacedBy(12.dp)
 		) {
-			Column(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(24.dp),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.Center
+
+			ProfileSection(
+				title = "About",
+				icon = Icons.Default.Person
 			) {
-				Box(
-					modifier = Modifier.size(150.dp),
-					contentAlignment = Alignment.Center
-				) {
-					Box(
-						modifier = Modifier
-							.size(150.dp)
-							.clip(CircleShape)
-							.background(
-								MaterialTheme.colorScheme.surfaceVariant,
-								CircleShape
-							),
-						contentAlignment = Alignment.Center
+				Text(
+					text = extendedInfo.shortBio.ifBlank { "No bio added yet" },
+					style = MaterialTheme.typography.bodyLarge,
+					lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.4,
+					color = if (extendedInfo.shortBio.isBlank()) 
+						MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+					else
+						MaterialTheme.colorScheme.onSurface
+				)
+			}
+
+			ProfileSection(
+				title = "Skills",
+				icon = Icons.Default.Code
+			) {
+				val skills = extendedInfo.skills.filter { it.isNotBlank() }
+				if (skills.isEmpty()) {
+					Text(
+						text = "No skills added yet",
+						style = MaterialTheme.typography.bodyLarge,
+						color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+					)
+				} else {
+					SkillsFlowRow(skills = skills)
+				}
+			}
+
+			ProfileSection(
+				title = "Work Experience",
+				icon = Icons.Default.Work
+			) {
+				val jobs = extendedInfo.pastJobHistory.filter { it.isNotBlank() }
+				if (jobs.isEmpty()) {
+					Text(
+						text = "No work experience added yet",
+						style = MaterialTheme.typography.bodyLarge,
+						color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+					)
+				} else {
+					Column(
+						verticalArrangement = Arrangement.spacedBy(16.dp)
 					) {
-						Column(horizontalAlignment = Alignment.CenterHorizontally) {
-							Icon(
-								imageVector = Icons.Default.Person,
-								contentDescription = "No profile photo",
-								modifier = Modifier.size(64.dp),
-								tint = MaterialTheme.colorScheme.onSurfaceVariant
-							)
-							Text(
-								"No profile image",
-								style = MaterialTheme.typography.labelSmall,
-								modifier = Modifier.padding(top = 4.dp)
+						jobs.forEachIndexed { index, job ->
+							JobHistoryItem(
+								job = job,
+								isFirst = index == 0,
+								isLast = index == jobs.size - 1
 							)
 						}
 					}
 				}
 			}
-		}
 
-		ProfileSection(
-			title = "About",
-			icon = Icons.Default.Person,
-			modifier = Modifier.padding(horizontal = 25.dp, vertical = 8.dp)
-		) {
-			Text(
-				text = extendedInfo.shortBio,
-				style = MaterialTheme.typography.bodyLarge,
-				lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.2
-			)
-		}
+			Spacer(Modifier.height(8.dp))
 
-		ProfileSection(
-			title = "Skills",
-			icon = Icons.Default.Code,
-			modifier = Modifier.padding(horizontal = 25.dp, vertical = 8.dp)
-		) {
-			Column(
-				verticalArrangement = Arrangement.spacedBy(8.dp)
+			Row(
+				Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(12.dp)
 			) {
-				extendedInfo.skills.filter { it.isNotBlank() }.forEach { skill ->
-					ProfileChip(text = skill)
+				OutlinedButton(
+					onClick = {
+						setRefresh(navController)
+						navController.popBackStack()
+					},
+					modifier = Modifier
+						.weight(1f)
+						.height(56.dp),
+					shape = RoundedCornerShape(12.dp)
+				) {
+					Icon(
+						Icons.Filled.ArrowBack,
+						contentDescription = null,
+						modifier = Modifier.size(20.dp)
+					)
+					Spacer(modifier = Modifier.size(8.dp))
+					Text(
+						text = "Back",
+						style = MaterialTheme.typography.titleMedium
+					)
+				}
+				Button(
+					onClick = {
+						navController.navigate(Screen.AddOrEditExtendedInfo)
+					},
+					modifier = Modifier
+						.weight(1f)
+						.height(56.dp),
+					shape = RoundedCornerShape(12.dp)
+				) {
+					Icon(
+						Icons.Filled.Edit,
+						contentDescription = null,
+						modifier = Modifier.size(20.dp)
+					)
+					Spacer(modifier = Modifier.size(8.dp))
+					Text(
+						text = "Edit Profile",
+						style = MaterialTheme.typography.titleMedium
+					)
 				}
 			}
-		}
-
-		ProfileSection(
-			title = "Work Experience",
-			icon = Icons.Default.Work,
-			modifier = Modifier.padding(horizontal = 25.dp, vertical = 8.dp)
-		) {
-			Column(
-				verticalArrangement = Arrangement.spacedBy(16.dp)
-			) {
-				extendedInfo.pastJobHistory.filter { it.isNotBlank() }
-					.forEachIndexed { index, job ->
-						JobHistoryItem(
-							job = job,
-							isFirst = index == 0,
-							isLast = index == extendedInfo.pastJobHistory.size - 1
-						)
-					}
-			}
-		}
-
-		Spacer(Modifier.height(16.dp))
-
-		Row(
-			Modifier
-				.fillMaxWidth()
-				.padding(16.dp),
-			horizontalArrangement = Arrangement.spacedBy(5.dp)
-
-		) {
-			Button(
-				onClick = {
-					navController.navigate(Screen.AddOrEditExtendedInfo)
-				},
-				modifier = Modifier
-					.weight(1f)
-					.height(50.dp),
-				shape = RoundedCornerShape(12.dp)
-			) {
-				Text(
-					text = "Edit",
-					style = MaterialTheme.typography.bodyLarge,
-					fontWeight = FontWeight.Bold
-				)
-			}
-			OutlinedButton(
-				onClick = {
-					setRefresh(navController)
-					navController.popBackStack()
-				},
-				modifier = Modifier
-					.weight(1f)
-					.height(50.dp),
-				shape = RoundedCornerShape(12.dp)
-			) {
-				Text(
-					text = "Back",
-					style = MaterialTheme.typography.bodyLarge,
-					fontWeight = FontWeight.Bold
-				)
-			}
+			
+			Spacer(Modifier.height(16.dp))
 		}
 	}
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ProfileSection(
-	title: String,
-	icon: androidx.compose.ui.graphics.vector.ImageVector,
-	modifier: Modifier = Modifier,
-	content: @Composable () -> Unit
-) {
-	Card(
-		modifier = modifier.fillMaxWidth(),
-		elevation = CardDefaults.cardElevation(4.dp),
-		shape = RoundedCornerShape(16.dp)
+private fun SkillsFlowRow(skills: List<String>) {
+	FlowRow(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(8.dp),
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(20.dp)
-		) {
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					imageVector = icon,
-					contentDescription = title,
-					modifier = Modifier.size(20.dp),
-					tint = MaterialTheme.colorScheme.primary
-				)
-				Text(
-					text = title,
-					style = MaterialTheme.typography.titleLarge,
-					fontWeight = FontWeight.SemiBold,
-					modifier = Modifier.padding(start = 12.dp)
-				)
-			}
-
-			Spacer(modifier = Modifier.height(12.dp))
-			content()
+		skills.forEach { skill ->
+			ProfileChip(text = skill)
 		}
 	}
 }
@@ -258,13 +223,14 @@ private fun ProfileChip(
 ) {
 	Box(
 		modifier = modifier
-			.clip(RoundedCornerShape(16.dp))
+			.clip(RoundedCornerShape(20.dp))
 			.background(MaterialTheme.colorScheme.primaryContainer)
-			.padding(horizontal = 12.dp, vertical = 6.dp)
+			.padding(horizontal = 16.dp, vertical = 8.dp)
 	) {
 		Text(
 			text = text,
-			style = MaterialTheme.typography.labelMedium,
+			style = MaterialTheme.typography.bodyMedium,
+			fontWeight = FontWeight.Medium,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 	}
@@ -281,21 +247,21 @@ private fun JobHistoryItem(
 		verticalAlignment = Alignment.Top
 	) {
 		Column(
-			modifier = Modifier.width(24.dp),
+			modifier = Modifier.width(28.dp),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			if (!isFirst) {
 				Box(
 					modifier = Modifier
 						.width(2.dp)
-						.height(8.dp)
-						.background(MaterialTheme.colorScheme.outlineVariant)
+						.height(12.dp)
+						.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
 				)
 			}
 
 			Box(
 				modifier = Modifier
-					.size(10.dp)
+					.size(12.dp)
 					.clip(CircleShape)
 					.background(MaterialTheme.colorScheme.primary)
 			)
@@ -304,21 +270,25 @@ private fun JobHistoryItem(
 				Box(
 					modifier = Modifier
 						.width(2.dp)
-						.height(8.dp)
-						.background(MaterialTheme.colorScheme.outlineVariant)
+						.weight(1f)
+						.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
 				)
 			}
 		}
 
-		Column(
+		Card(
 			modifier = Modifier
-				.padding(start = 16.dp)
-				.fillMaxWidth()
+				.padding(start = 12.dp)
+				.fillMaxWidth(),
+			colors = CardDefaults.cardColors(
+				containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+			),
+			shape = RoundedCornerShape(12.dp)
 		) {
 			Text(
 				text = job,
 				style = MaterialTheme.typography.bodyLarge,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.padding(12.dp)
 			)
 		}
 	}
