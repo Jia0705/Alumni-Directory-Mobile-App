@@ -31,7 +31,7 @@ class MyApp: Application() {
 					if (currentUser != null) {
 						val updates = mapOf("token" to token)
 						AlumniRepo.getInstance().updateProfile(currentUser.id, updates)
-						Log.d("token", "Token saved to Firestore")
+						Log.d("token", "Token saved to database")
 					}
 				} catch (e: Exception) {
 					Log.e("token", "Failed to save token", e)

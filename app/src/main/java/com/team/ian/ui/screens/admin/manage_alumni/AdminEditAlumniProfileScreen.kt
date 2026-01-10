@@ -193,11 +193,11 @@ fun AdminEditAlumniProfileScreen(
 							.weight(1f)
 							.background(
 								if (alumni.status == AccountStatus.APPROVED) {
-									Color.Red.copy(alpha = 0.2f)
+									Color(0xFFD1FAE5)
 								} else {
 									Color.Transparent
 								}
-							)
+							, RoundedCornerShape(8.dp))
 							.fillMaxHeight()
 							.clickable {
 								viewModel.updateAlumniStatusState(AccountStatus.APPROVED)
@@ -211,11 +211,11 @@ fun AdminEditAlumniProfileScreen(
 							.weight(1f)
 							.background(
 								if (alumni.status == AccountStatus.REJECTED) {
-									Color.Red.copy(alpha = 0.2f)
+									Color(0xFFFEE2E2)
 								} else {
 									Color.Transparent
 								}
-							)
+							, RoundedCornerShape(8.dp))
 							.fillMaxHeight()
 							.clickable {
 								viewModel.updateAlumniStatusState(AccountStatus.REJECTED)
@@ -229,11 +229,11 @@ fun AdminEditAlumniProfileScreen(
 							.weight(1f)
 							.background(
 								if (alumni.status == AccountStatus.INACTIVE) {
-									Color.Red.copy(alpha = 0.2f)
+									Color(0xFFD1D5DB)
 								} else {
 									Color.Transparent
 								}
-							)
+							, RoundedCornerShape(8.dp))
 							.fillMaxHeight()
 							.clickable {
 								viewModel.updateAlumniStatusState(AccountStatus.INACTIVE)

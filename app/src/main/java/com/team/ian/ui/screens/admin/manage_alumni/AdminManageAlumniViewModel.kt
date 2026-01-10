@@ -47,6 +47,10 @@ class AdminManageAlumniViewModel(
 	private val _availableYears = MutableStateFlow<List<Int>>(emptyList())
 	val availableYears = _availableYears.asStateFlow()
 
+	companion object {
+		var presetStatus: AccountStatus? = null
+	}
+
 	init {
 		getAllAlumni()
 		observeFilters()
@@ -123,5 +127,4 @@ class AdminManageAlumniViewModel(
 			}
 		}
 	}
-
 }

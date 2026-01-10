@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -169,7 +170,11 @@ fun LoginScreen(
 					modifier = Modifier
 						.fillMaxWidth()
 						.height(50.dp),
-					shape = RoundedCornerShape(12.dp)
+					shape = RoundedCornerShape(12.dp),
+					colors = ButtonDefaults.outlinedButtonColors(
+						containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+						contentColor = MaterialTheme.colorScheme.primary
+					)
 				) {
 					Text(
 						text = "Sign in with Google",

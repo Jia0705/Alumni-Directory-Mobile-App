@@ -1,7 +1,10 @@
 package com.team.ian.ui.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
@@ -14,6 +17,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -30,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,12 +48,15 @@ import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
 import com.team.ian.ui.screens.status.PendingScreen
 import com.team.ian.ui.screens.status.RejectedScreen
+import com.team.ian.ui.screens.status.InactiveScreen
 import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
 import com.team.ian.service.AuthService
 import com.team.ian.data.model.Role
+import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.ui.screens.admin.manage_alumni.AdminEditAlumniProfileScreen
 import com.team.ian.ui.screens.admin.manage_alumni.AdminManageAlumniScreen
+import com.team.ian.ui.screens.admin.dashboard.AdminDashboardScreen
 import com.team.ian.ui.screens.admin.registrations.AdminViewAllRegistrationsScreen
 import com.team.ian.ui.screens.admin.registrations.AdminViewRegistrationScreen
 import com.team.ian.ui.screens.profile.AddOrEditExtendedInfoScreen
@@ -63,12 +71,18 @@ fun AppNav() {
 	val drawerState = rememberDrawerState(DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
 	val authService = AuthService.getInstance()
+	val alumniRepo = AlumniRepo.getInstance()
 	val currentUser = authService.user.collectAsStateWithLifecycle().value
+	val pendingAlumni = alumniRepo.getPendingAlumni().collectAsStateWithLifecycle(
+		initialValue = emptyList()
+	).value
+	val pendingCount = pendingAlumni.size
 
 	val allDrawerItems = listOf(
 		DrawerItem("Home", Icons.Default.Home, Screen.Home),
-		DrawerItem("Admin View Pending Registrations", Icons.Default.Dashboard, Screen.AdminViewAllRegistrations, Role.ADMIN),
-		DrawerItem("Admin Manage Alumni", Icons.Default.People, Screen.AdminManageAlumni, Role.ADMIN),
+		DrawerItem("Admin Dashboard", Icons.Default.Dashboard, Screen.AdminDashboard, Role.ADMIN),
+		DrawerItem("Manage Alumni", Icons.Default.People, Screen.AdminManageAlumni, Role.ADMIN),
+		DrawerItem("View Registrations", Icons.Default.Dashboard, Screen.AdminViewAllRegistrations, Role.ADMIN),
 		DrawerItem("Profile", Icons.Default.Person, Screen.Profile)
 	)
 
@@ -100,9 +114,10 @@ fun AppNav() {
 		Screen.Register::class.qualifiedName,
 		Screen.Pending::class.qualifiedName,
 		Screen.Rejected::class.qualifiedName,
+		Screen.Inactive::class.qualifiedName,
 		Screen.AdminViewRegistration::class.qualifiedName,
-    Screen.AdminEditAlumniProfile::class.qualifiedName,
-    Screen.ViewProfile::class.qualifiedName
+    	Screen.AdminEditAlumniProfile::class.qualifiedName,
+    	Screen.ViewProfile::class.qualifiedName
 	)
 
 	val showScaffold =
@@ -117,7 +132,23 @@ fun AppNav() {
 				ModalDrawerSheet {
 					drawerItems.forEach { item ->
 						NavigationDrawerItem(
-							label = { Text(item.title) },
+							label = {
+								if (item.screen == Screen.AdminViewAllRegistrations) {
+									Row(modifier = Modifier.fillMaxWidth()) {
+										Text(
+											text = item.title,
+											modifier = Modifier.weight(1f)
+										)
+										Text(
+											text = pendingCount.toString(),
+											textAlign = TextAlign.End,
+											color = MaterialTheme.colorScheme.onSurfaceVariant
+										)
+									}
+								} else {
+									Text(item.title)
+								}
+							},
 							selected = item.screen::class.qualifiedName == currentRoute,
 							icon = { Icon(item.icon, null) },
 							onClick = {
@@ -128,6 +159,7 @@ fun AppNav() {
 							}
 						)
 					}
+					Spacer(Modifier.weight(1f))
 				}
 			}
 		) {
@@ -172,6 +204,10 @@ fun AppNav() {
 							RejectedScreen(navController)
 						}
 
+						composable<Screen.Inactive> {
+							InactiveScreen(navController)
+						}
+
 						composable<Screen.AdminManageAlumni> {
 							AdminManageAlumniScreen(navController)
 						}
@@ -190,6 +226,10 @@ fun AppNav() {
 
 						composable<Screen.AdminViewAllRegistrations> {
 							AdminViewAllRegistrationsScreen(navController)
+						}
+
+						composable<Screen.AdminDashboard> {
+							AdminDashboardScreen(navController)
 						}
 
 						composable<Screen.AdminViewRegistration> {
@@ -250,6 +290,10 @@ fun AppNav() {
 					RejectedScreen(navController)
 				}
 
+				composable<Screen.Inactive> {
+					InactiveScreen(navController)
+				}
+
 				composable<Screen.Home> {
 					HomeScreen(navController)
 				}
@@ -264,6 +308,10 @@ fun AppNav() {
 
 				composable<Screen.AdminViewAllRegistrations> {
 					AdminViewAllRegistrationsScreen(navController)
+				}
+
+				composable<Screen.AdminDashboard> {
+					AdminDashboardScreen(navController)
 				}
 
 				composable<Screen.AdminViewRegistration> {

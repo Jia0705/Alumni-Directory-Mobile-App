@@ -21,9 +21,13 @@ sealed class Screen {
 	@Serializable
 	object Rejected : Screen()
 	@Serializable
+	object Inactive: Screen()
+	@Serializable
 	object AdminViewAllRegistrations : Screen()
 	@Serializable
 	data class AdminViewRegistration(val pendingAlumniId: String) : Screen()
+	@Serializable
+	object AdminDashboard: Screen()
 	@Serializable
 	object AdminManageAlumni : Screen()
 	@Serializable
