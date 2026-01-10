@@ -67,6 +67,7 @@ fun EditOwnProfileScreen(
 	var showDiscardDialog by remember { mutableStateOf(false) }
 
 	LaunchedEffect(Unit) {
+        viewModel.loadProfile()
 		viewModel.finish.collect {
 			setRefresh(navController)
 			navController.popBackStack()

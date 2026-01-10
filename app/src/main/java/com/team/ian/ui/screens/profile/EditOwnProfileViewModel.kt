@@ -33,7 +33,7 @@ class EditOwnProfileViewModel(
 		checkForExtendedInfo()
 	}
 
-	private fun loadProfile() {
+    fun loadProfile() {
 		viewModelScope.launch(Dispatchers.IO) {
 			try {
 				val userId = authService.getCurrentUser()?.id
