@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,11 +70,13 @@ fun ProfileScreen(
 
     val viewModel: ProfileViewModel = viewModel()
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
+    val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
+    val contactLinks = viewModel.contactLinks.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(user?.id) {
-        user?.id?.let {
-            viewModel.loadAlumniProfile(it)
-        }
+    LaunchedEffect(Unit) {
+        viewModel.loadAlumniProfile()
+        viewModel.getExtendedInfo()
+        viewModel.getContactLinks()
     }
 
     fun signOut() {
@@ -190,27 +194,28 @@ fun ProfileScreen(
                     InfoRow("Country", alumni.country, Icons.Filled.Public)
                 }
 
-                // TODO: Add logic to fetch contact links data
                 ProfileSection(title = "Contact Links", icon = Icons.Outlined.Link) {
-                    InfoRow("Phone", "+1 (555) 123-4567", Icons.Filled.Phone)
-                    InfoRow("LinkedIn", "linkedin.com/in/johndoe", Icons.Outlined.Link)
-                    InfoRow("GitHub", "github.com/johndoe", Icons.Outlined.Code)
+                    InfoRow("Phone", contactLinks.phoneNumber, Icons.Filled.Phone)
+                    InfoRow("LinkedIn", contactLinks.linkedIn, Icons.Outlined.Link)
+                    InfoRow("GitHub", contactLinks.github, Icons.Outlined.Code)
                 }
 
-                // TODO: Add logic to fetch extended info data
                 ProfileSection(title = "Extended Information", icon = Icons.Filled.Person) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "About",
+                            text = "Short Bio",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Passionate software engineer with 5+ years of experience in mobile development. Love building elegant and efficient solutions.",
+                            text = extendedInfo.shortBio.ifBlank { "No bio added yet" },
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = if (extendedInfo.shortBio.isBlank())
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            else
+                                MaterialTheme.colorScheme.onSurface
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -221,27 +226,37 @@ fun ProfileScreen(
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Kotlin • Jetpack Compose • Android • Firebase • REST APIs • Git",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        val skills = extendedInfo.skills.filter { it.isNotBlank() }
+                        if (skills.isEmpty()) {
+                            Text(
+                                text = "No skills added yet",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        } else {
+                            SkillsChipRow(skills = skills)
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
-
+                        
                         Text(
                             text = "Work Experience",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "• Senior Android Developer at Tech Corp (2021-Present)\n• Android Developer at StartupXYZ (2019-2021)\n• Junior Developer at Mobile Solutions Inc (2018-2019)",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        val jobs = extendedInfo.pastJobHistory.filter { it.isNotBlank() }
+                        if (jobs.isEmpty()) {
+                            Text(
+                                text = "No work experience added yet",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        } else {
+                            JobHistoryChips(jobs = jobs)
+                        }
                     }
                 }
 
@@ -305,5 +320,67 @@ fun ProfileScreen(
                 Spacer(Modifier.height(16.dp))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SkillsChipRow(skills: List<String>) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        skills.forEach { skill ->
+            SkillChip(text = skill)
+        }
+    }
+}
+
+@Composable
+private fun SkillChip(text: String) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun JobHistoryChips(jobs: List<String>) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        jobs.forEach { job ->
+            JobChip(text = job)
+        }
+    }
+}
+
+@Composable
+private fun JobChip(text: String) {
+    Card(
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        )
     }
 }
