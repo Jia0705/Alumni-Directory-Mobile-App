@@ -59,6 +59,7 @@ import com.team.ian.ui.screens.admin.manage_alumni.AdminManageAlumniScreen
 import com.team.ian.ui.screens.admin.dashboard.AdminDashboardScreen
 import com.team.ian.ui.screens.admin.registrations.AdminViewAllRegistrationsScreen
 import com.team.ian.ui.screens.admin.registrations.AdminViewRegistrationScreen
+import com.team.ian.ui.screens.profile.AddOrEditContactLinksScreen
 import com.team.ian.ui.screens.profile.AddOrEditExtendedInfoScreen
 import com.team.ian.ui.screens.profile.ExtendedInfoScreen
 import com.team.ian.ui.screens.viewProfile.ViewProfileScreen
@@ -252,6 +253,9 @@ fun AppNav() {
 							ExtendedInfoScreen(navController)
 						}
 
+                        composable<Screen.AddOrEditContactLinks> {
+                            AddOrEditContactLinksScreen(navController)
+                        }
 					}
 
 					FullScreenLoader()
@@ -333,6 +337,10 @@ fun AppNav() {
 				composable<Screen.ExtendedInfo> {
 					ExtendedInfoScreen(navController)
 				}
+
+                composable<Screen.AddOrEditContactLinks> {
+                    AddOrEditContactLinksScreen(navController)
+                }
 			}
 
 			FullScreenLoader()

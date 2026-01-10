@@ -137,13 +137,6 @@ fun RegisterScreen(
 						onNext = { page = 3 },
 						onBack = { page = 1 },
 					)
-
-//					3 -> ExtendedInfoPage(
-//						extendedInfo = extendedInfo,
-//						onUpdate = { extendedInfo = it },
-//						onSubmit = { submitExtendedInfo() },
-//						onBack = { page = 2 }
-//					)
 				}
 
 				Spacer(Modifier.height(24.dp))

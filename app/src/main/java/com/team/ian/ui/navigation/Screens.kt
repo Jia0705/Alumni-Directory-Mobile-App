@@ -38,4 +38,8 @@ sealed class Screen {
 	object AddOrEditExtendedInfo: Screen()
 	@Serializable
 	object ExtendedInfo: Screen()
+    @Serializable
+    object AddOrEditContactLinks: Screen()
+    @Serializable
+    object ContactLinks: Screen()
 }

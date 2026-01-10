@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.team.ian.components.InfoRow
+import com.team.ian.ui.components.InfoRow
 
 @Composable
 fun AdminViewRegistrationScreen(
@@ -71,10 +73,10 @@ fun AdminViewRegistrationScreen(
 
 				Spacer(Modifier.height(12.dp))
 
-				InfoRow("Full Name", alumni.fullName)
-				InfoRow("Email", alumni.email)
-				InfoRow("Graduation Year", alumni.graduationYear.toString())
-				InfoRow("Department", alumni.department)
+				InfoRow("Full Name", alumni.fullName, Icons.Filled.Email)
+				InfoRow("Email", alumni.email, Icons.Filled.Email)
+				InfoRow("Graduation Year", alumni.graduationYear.toString(), Icons.Filled.Email)
+				InfoRow("Department", alumni.department, Icons.Filled.Email)
 
 				Spacer(Modifier.height(16.dp))
 				HorizontalDivider()
@@ -89,9 +91,9 @@ fun AdminViewRegistrationScreen(
 
 				Spacer(Modifier.height(12.dp))
 
-				InfoRow("Job Title", alumni.jobTitle)
-				InfoRow("Company", alumni.company)
-				InfoRow("Tech Stack", alumni.primaryStack)
+				InfoRow("Job Title", alumni.jobTitle, Icons.Filled.Email)
+				InfoRow("Company", alumni.company, Icons.Filled.Email)
+				InfoRow("Tech Stack", alumni.primaryStack, Icons.Filled.Email)
 
 				Spacer(Modifier.height(16.dp))
 				HorizontalDivider()
@@ -106,8 +108,8 @@ fun AdminViewRegistrationScreen(
 
 				Spacer(Modifier.height(12.dp))
 
-				InfoRow("City", alumni.city)
-				InfoRow("Country", alumni.country)
+				InfoRow("City", alumni.city, Icons.Filled.Email)
+				InfoRow("Country", alumni.country, Icons.Filled.Email)
 
 				Spacer(Modifier.height(32.dp))
 
