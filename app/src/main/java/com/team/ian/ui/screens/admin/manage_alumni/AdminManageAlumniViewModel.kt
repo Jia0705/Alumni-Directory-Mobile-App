@@ -123,7 +123,7 @@ class AdminManageAlumniViewModel(
 				)
 
 			}.collect { filteredList ->
-				_alumni.value = filteredList
+				_alumni.value = filteredList.sortedByDescending { it.createdAt }
 			}
 		}
 	}

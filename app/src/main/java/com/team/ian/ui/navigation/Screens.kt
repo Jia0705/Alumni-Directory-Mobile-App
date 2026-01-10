@@ -13,6 +13,8 @@ sealed class Screen {
 	@Serializable
 	object EditOwnProfile : Screen()
 	@Serializable
+	object Settings : Screen()
+	@Serializable
 	object Login : Screen()
 	@Serializable
 	object Register : Screen()

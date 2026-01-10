@@ -118,9 +118,11 @@ fun ViewProfileScreen(
 					modifier = Modifier.fillMaxWidth(),
 					verticalArrangement = Arrangement.spacedBy(12.dp)
 				) {
-					InfoRow("Email", alumni.email, Icons.Filled.Email)
-					InfoRow("Graduation Year", alumni.graduationYear.toString(), Icons.Filled.Email)
-					InfoRow("Department", alumni.department, Icons.Filled.Email)
+					if (alumni.showEmail) {
+						InfoRow("Email", alumni.email)
+					}
+					InfoRow("Graduation Year", alumni.graduationYear.toString())
+					InfoRow("Department", alumni.department)
 				}
 
 				Spacer(Modifier.height(16.dp))

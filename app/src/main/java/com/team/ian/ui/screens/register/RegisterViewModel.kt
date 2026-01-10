@@ -41,7 +41,17 @@ class RegisterViewModel(
 					company = registration.organization,
 					primaryStack = registration.techStack,
 					city = registration.city,
-					country = registration.country
+					country = registration.country,
+					linkedin = registration.linkedin,
+					github = registration.github,
+					phone = registration.phone,
+					shortBio = registration.shortBio.ifBlank { registration.shortBio },
+					skills = registration.skills.split(",")
+						.map { it.trim() }
+						.filter { it.isNotBlank() },
+					pastJobHistory = registration.workExperience.split(",")
+						.map { it.trim() }
+						.filter { it.isNotBlank() },
 				)
 
 				// Save alumni profile (status is PENDING and role is NONE)

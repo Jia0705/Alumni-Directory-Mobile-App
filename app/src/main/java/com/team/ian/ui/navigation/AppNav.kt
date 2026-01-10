@@ -44,6 +44,7 @@ import com.team.ian.ui.screens.home.HomeScreen
 import com.team.ian.ui.screens.login.LoginScreen
 import com.team.ian.ui.screens.profile.EditOwnProfileScreen
 import com.team.ian.ui.screens.profile.ProfileScreen
+import com.team.ian.ui.screens.settings.SettingsScreen
 import com.team.ian.ui.screens.register.RegisterScreen
 import com.team.ian.ui.screens.splash.SplashScreen
 import com.team.ian.ui.screens.status.PendingScreen
@@ -225,6 +226,10 @@ fun AppNav() {
 							EditOwnProfileScreen(navController)
 						}
 
+						composable<Screen.Settings> {
+							SettingsScreen(navController)
+						}
+
 						composable<Screen.AdminViewAllRegistrations> {
 							AdminViewAllRegistrationsScreen(navController)
 						}
@@ -308,6 +313,10 @@ fun AppNav() {
 
 				composable<Screen.EditOwnProfile> {
 					EditOwnProfileScreen(navController)
+				}
+
+				composable<Screen.Settings> {
+					SettingsScreen(navController)
 				}
 
 				composable<Screen.AdminViewAllRegistrations> {

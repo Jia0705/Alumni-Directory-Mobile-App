@@ -10,6 +10,12 @@ data class Registration(
 	val techStack: String = "",
 	val city: String = "",
 	val country: String = "",
-	val contact: List<String> = emptyList()
+	val linkedin: String = "",
+	val github: String = "",
+	val phone: String = "",
+	val shortBio: String = "",
+	val skills: String = "",
+	val workExperience: String = "",
+	val photoURL: String = ""
 )
 
