@@ -26,7 +26,14 @@ data class Alumni(
     val linkedin: String = "",
     val github: String = "",
     val phone: String = "",
+    val shortBio: String = "",
+    val skills: List<String> = emptyList(),
+    val pastJobHistory: List<String> = emptyList(),
     val photoURL: String = "",
+    val showEmail: Boolean = true,
+	val showPhone: Boolean = true,
+	val showLinkedIn: Boolean = true,
+	val showGithub: Boolean = true,
 
     // FCM token
     val token: String = "",

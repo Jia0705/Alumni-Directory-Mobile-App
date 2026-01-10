@@ -223,7 +223,13 @@ fun HomeScreen(
 											}
 										}
 										Spacer(modifier = Modifier.height(16.dp))
-										Text("${it.fullName}, ${it.email}")
+										Text(
+											text = if (it.showEmail) {
+												"${it.fullName}, ${it.email}"
+											} else {
+												it.fullName
+											}
+										)
 									}
 								}
 							}

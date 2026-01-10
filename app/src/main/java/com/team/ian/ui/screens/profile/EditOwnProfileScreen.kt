@@ -19,17 +19,24 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.BackHandler
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.components.InfoTextField
+import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
 import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
@@ -41,10 +48,30 @@ fun EditOwnProfileScreen(
 	val viewModel: EditOwnProfileViewModel = viewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
 	val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
+	var initialAlumni by remember { mutableStateOf(Alumni()) }
+	var initialSet by remember { mutableStateOf(false) }
+	var showDiscardDialog by remember { mutableStateOf(false) }
 
 	LaunchedEffect(Unit) {
 		viewModel.finish.collect {
 			setRefresh(navController)
+			navController.popBackStack()
+		}
+	}
+
+	LaunchedEffect(alumni.uid) {
+		if (!initialSet && alumni.uid.isNotBlank()) {
+			initialAlumni = alumni
+			initialSet = true
+		}
+	}
+
+	val hasChanges = initialSet && alumni != initialAlumni
+
+	BackHandler {
+		if (hasChanges) {
+			showDiscardDialog = true
+		} else {
 			navController.popBackStack()
 		}
 	}
@@ -232,5 +259,28 @@ fun EditOwnProfileScreen(
 				}
 			}
 		}
+	}
+
+	if (showDiscardDialog) {
+		AlertDialog(
+			onDismissRequest = { showDiscardDialog = false },
+			title = { Text("Discard changes?") },
+			text = { Text("You have unsaved changes.") },
+			confirmButton = {
+				TextButton(
+					onClick = {
+						showDiscardDialog = false
+						navController.popBackStack()
+					}
+				) {
+					Text("Discard")
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { showDiscardDialog = false }) {
+					Text("Keep Editing")
+				}
+			}
+		)
 	}
 }

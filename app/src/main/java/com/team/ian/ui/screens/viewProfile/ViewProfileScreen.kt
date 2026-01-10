@@ -116,7 +116,9 @@ fun ViewProfileScreen(
 					modifier = Modifier.fillMaxWidth(),
 					verticalArrangement = Arrangement.spacedBy(12.dp)
 				) {
-					InfoRow("Email", alumni.email)
+					if (alumni.showEmail) {
+						InfoRow("Email", alumni.email)
+					}
 					InfoRow("Graduation Year", alumni.graduationYear.toString())
 					InfoRow("Department", alumni.department)
 				}

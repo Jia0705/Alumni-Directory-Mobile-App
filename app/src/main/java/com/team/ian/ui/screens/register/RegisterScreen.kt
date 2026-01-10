@@ -1,6 +1,5 @@
 package com.team.ian.ui.screens.register
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.data.model.Registration
 import com.team.ian.ui.navigation.Screen
 
@@ -49,10 +47,39 @@ fun RegisterScreen(
 
 	var page by remember { mutableIntStateOf(0) }
 	var registration by remember { mutableStateOf(Registration()) }
-	var extendedInfo by remember { mutableStateOf(ExtendedInfo()) }
 	var password by remember { mutableStateOf("") }
 
 	fun submitRegistration() {
+		val missing = mutableListOf<String>()
+		if (registration.name.isBlank()) missing.add("Full Name")
+		if (registration.email.isBlank()) missing.add("Email")
+		if (password.isBlank()) missing.add("Password")
+		if (registration.gradYear <= 0) missing.add("Graduation Year")
+		if (registration.department.isBlank()) missing.add("Department / Major")
+		if (registration.position.isBlank()) missing.add("Current Position")
+		if (registration.organization.isBlank()) missing.add("Company / Organization")
+		if (registration.techStack.isBlank()) missing.add("Primary Tech Stack")
+		if (registration.city.isBlank()) missing.add("City")
+		if (registration.country.isBlank()) missing.add("Country")
+
+		if (missing.isNotEmpty()) {
+			Toast.makeText(
+				context,
+				"Please fill: ${missing.joinToString()}",
+				Toast.LENGTH_LONG
+			).show()
+			return
+		}
+
+		if (password.length < 6) {
+			Toast.makeText(
+				context,
+				"Password must be at least 6 characters",
+				Toast.LENGTH_LONG
+			).show()
+			return
+		}
+
 		viewModel.register(
 			registration = registration,
 			password = password,
@@ -65,10 +92,6 @@ fun RegisterScreen(
 				Toast.makeText(context, it, Toast.LENGTH_LONG).show()
 			}
 		)
-	}
-
-	fun submitExtendedInfo() {
-		Log.d("debugging", "yes")
 	}
 
 	Box(
@@ -100,7 +123,7 @@ fun RegisterScreen(
 				Spacer(Modifier.height(8.dp))
 
 				Text(
-					text = "Step ${page + 1} of 3",
+					text = "Step ${page + 1} of 5",
 					style = MaterialTheme.typography.bodyMedium,
 					color = MaterialTheme.colorScheme.onSurfaceVariant
 				)
@@ -108,7 +131,7 @@ fun RegisterScreen(
 				Spacer(Modifier.height(16.dp))
 
 				LinearProgressIndicator(
-					progress = { (page + 1) / 3f },
+					progress = { (page + 1) / 5f },
 					modifier = Modifier.fillMaxWidth()
 				)
 
@@ -133,17 +156,23 @@ fun RegisterScreen(
 					2 -> LocationInfoPage(
 						registration = registration,
 						onUpdate = { registration = it },
-						onSubmit = { submitRegistration() },
 						onNext = { page = 3 },
-						onBack = { page = 1 },
+						onBack = { page = 1 }
 					)
 
-//					3 -> ExtendedInfoPage(
-//						extendedInfo = extendedInfo,
-//						onUpdate = { extendedInfo = it },
-//						onSubmit = { submitExtendedInfo() },
-//						onBack = { page = 2 }
-//					)
+					3 -> ContactMethodsPage(
+						registration = registration,
+						onUpdate = { registration = it },
+						onNext = { page = 4 },
+						onBack = { page = 2 }
+					)
+
+					4 -> ExtendedInfoPage(
+						registration = registration,
+						onUpdate = { registration = it },
+						onSubmit = { submitRegistration() },
+						onBack = { page = 3 }
+					)
 				}
 
 				Spacer(Modifier.height(24.dp))
@@ -251,17 +280,22 @@ fun BasicInfoPage(
 
 		Spacer(Modifier.height(24.dp))
 
-		Button(
-			onClick = onNext,
-			modifier = Modifier
-				.fillMaxWidth()
-				.height(50.dp),
-			shape = RoundedCornerShape(12.dp)
-		) {
-			Text(
-				text = "Next",
-				style = MaterialTheme.typography.bodyLarge,
-				fontWeight = FontWeight.Bold
+	Button(
+		onClick = onNext,
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(50.dp),
+		shape = RoundedCornerShape(12.dp),
+		enabled = registration.name.isNotBlank() &&
+			registration.email.isNotBlank() &&
+			password.length >= 6 &&
+			registration.gradYear > 0 &&
+			registration.department.isNotBlank()
+	) {
+		Text(
+			text = "Next",
+			style = MaterialTheme.typography.bodyLarge,
+			fontWeight = FontWeight.Bold
 			)
 		}
 	}
@@ -319,17 +353,20 @@ fun ProfessionalInfoPage(
 
 		Spacer(Modifier.height(24.dp))
 
-		Button(
-			onClick = onNext,
-			modifier = Modifier
-				.fillMaxWidth()
-				.height(50.dp),
-			shape = RoundedCornerShape(12.dp)
-		) {
-			Text(
-				text = "Next",
-				style = MaterialTheme.typography.bodyLarge,
-				fontWeight = FontWeight.Bold
+	Button(
+		onClick = onNext,
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(50.dp),
+		shape = RoundedCornerShape(12.dp),
+		enabled = registration.position.isNotBlank() &&
+			registration.organization.isNotBlank() &&
+			registration.techStack.isNotBlank()
+	) {
+		Text(
+			text = "Next",
+			style = MaterialTheme.typography.bodyLarge,
+			fontWeight = FontWeight.Bold
 			)
 		}
 
@@ -352,7 +389,6 @@ fun LocationInfoPage(
 	registration: Registration,
 	onUpdate: (Registration) -> Unit,
 	onNext: () -> Unit,
-	onSubmit: () -> Unit,
 	onBack: () -> Unit,
 ) {
 	Column(
@@ -387,7 +423,170 @@ fun LocationInfoPage(
 			singleLine = true
 		)
 
+		Spacer(Modifier.height(16.dp))
+
+	Button(
+		onClick = onNext,
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(50.dp),
+		shape = RoundedCornerShape(12.dp),
+		enabled = registration.city.isNotBlank() &&
+			registration.country.isNotBlank()
+	) {
+		Text(
+			text = "Next",
+			style = MaterialTheme.typography.bodyLarge,
+			fontWeight = FontWeight.Bold
+			)
+		}
+
+		Spacer(Modifier.height(12.dp))
+
+		OutlinedButton(
+			onClick = onBack,
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(50.dp),
+			shape = RoundedCornerShape(12.dp)
+		) {
+			Text("Back")
+		}
+
+	}
+}
+
+@Composable
+fun ContactMethodsPage(
+	registration: Registration,
+	onUpdate: (Registration) -> Unit,
+	onNext: () -> Unit,
+	onBack: () -> Unit
+) {
+	Column(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Text(
+			text = "Contact Methods",
+			style = MaterialTheme.typography.titleLarge,
+			fontWeight = FontWeight.Bold
+		)
+
 		Spacer(Modifier.height(24.dp))
+
+		OutlinedTextField(
+			value = registration.linkedin,
+			onValueChange = { onUpdate(registration.copy(linkedin = it)) },
+			label = { Text("LinkedIn (optional)") },
+			modifier = Modifier.fillMaxWidth(),
+			shape = RoundedCornerShape(12.dp),
+			singleLine = true
+		)
+
+		Spacer(Modifier.height(16.dp))
+
+		OutlinedTextField(
+			value = registration.github,
+			onValueChange = { onUpdate(registration.copy(github = it)) },
+			label = { Text("GitHub (optional)") },
+			modifier = Modifier.fillMaxWidth(),
+			shape = RoundedCornerShape(12.dp),
+			singleLine = true
+		)
+
+		Spacer(Modifier.height(16.dp))
+
+		OutlinedTextField(
+			value = registration.phone,
+			onValueChange = { onUpdate(registration.copy(phone = it)) },
+			label = { Text("Phone (optional)") },
+			modifier = Modifier.fillMaxWidth(),
+			shape = RoundedCornerShape(12.dp),
+			singleLine = true
+		)
+
+		Spacer(Modifier.height(24.dp))
+
+		Button(
+			onClick = onNext,
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(50.dp),
+			shape = RoundedCornerShape(12.dp)
+		) {
+			Text(
+				text = "Next",
+				style = MaterialTheme.typography.bodyLarge,
+				fontWeight = FontWeight.Bold
+			)
+		}
+
+		Spacer(Modifier.height(12.dp))
+
+		OutlinedButton(
+			onClick = onBack,
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(50.dp),
+			shape = RoundedCornerShape(12.dp)
+		) {
+			Text("Back")
+		}
+	}
+}
+
+@Composable
+fun ExtendedInfoPage(
+	registration: Registration,
+	onUpdate: (Registration) -> Unit,
+	onSubmit: () -> Unit,
+	onBack: () -> Unit
+) {
+	Column(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Text(
+			text = "Extended Info",
+			style = MaterialTheme.typography.titleLarge,
+			fontWeight = FontWeight.Bold
+		)
+
+		Spacer(Modifier.height(24.dp))
+
+		OutlinedTextField(
+			value = registration.shortBio,
+			onValueChange = { onUpdate(registration.copy(shortBio = it)) },
+			label = { Text("About (optional)") },
+			modifier = Modifier.fillMaxWidth(),
+			shape = RoundedCornerShape(12.dp),
+			minLines = 4
+		)
+
+		Spacer(Modifier.height(16.dp))
+
+		OutlinedTextField(
+			value = registration.skills,
+			onValueChange = { onUpdate(registration.copy(skills = it)) },
+			label = { Text("Skills (comma separated)") },
+			modifier = Modifier.fillMaxWidth(),
+			shape = RoundedCornerShape(12.dp),
+			singleLine = true
+		)
+
+		Spacer(Modifier.height(16.dp))
+
+		OutlinedTextField(
+			value = registration.workExperience,
+			onValueChange = { onUpdate(registration.copy(workExperience = it)) },
+			label = { Text("Work Experience (comma separated)") },
+			modifier = Modifier.fillMaxWidth(),
+			shape = RoundedCornerShape(12.dp),
+			singleLine = true
+		)
+
+		Spacer(Modifier.height(16.dp))
 
 		Button(
 			onClick = onSubmit,
@@ -414,68 +613,5 @@ fun LocationInfoPage(
 		) {
 			Text("Back")
 		}
-
-	}
-	Button(onClick = onNext) {
-		Text("Add Extra Info?")
-		Text("Addition Info: Past job history, Skills, Short bio")
 	}
 }
-
-//@Composable
-//fun ExtendedInfoPage(
-//	extendedInfo: ExtendedInfo,
-//	onUpdate: (ExtendedInfo) -> Unit,
-//	onSubmit: () -> Unit,
-//	onBack: () -> Unit
-//) {
-//	Text("Past Job History")
-//	OutlinedTextField(
-//		value = extendedInfo.pastJobHistory,
-//		onValueChange = {
-//			onUpdate(
-//				extendedInfo.copy(extendedInfo.pastJobHistory = it)
-//			)
-//		}
-//	)
-//	Spacer(Modifier.padding(5.dp))
-//	Text("Skills")
-//	OutlinedTextField(
-//		value = extendedInfo.skills,
-//		onValueChange = {
-//			onUpdate(
-//				extendedInfo.copy(extendedInfo.skills = it)
-//			)
-//		}
-//	)
-//	Spacer(Modifier.padding(5.dp))
-//	Text("Short Bio")
-//	OutlinedTextField(
-//		value = extendedInfo.shortBio,
-//		onValueChange = {
-//			onUpdate(
-//				extendedInfo.copy(extendedInfo.shortBio = it)
-//			)
-//		}
-//	)
-//	Spacer(Modifier.padding(5.dp))
-//	Text("Profile Picture")
-//	OutlinedTextField(
-//		value = extendedInfo.profilePicUrl,
-//		onValueChange = {
-//			onUpdateData(
-//				extendedInfo.copy(profilePicUrl = it)
-//			)
-//		}
-//	)
-//	Spacer(modifier = Modifier.height(16.dp))
-//	Button(onClick = {}) {
-//		Text("Register")
-//	}
-//	Button(onClick = {
-//		onBack()
-//	}) {
-//		Text("Back")
-//	}
-//}
-
