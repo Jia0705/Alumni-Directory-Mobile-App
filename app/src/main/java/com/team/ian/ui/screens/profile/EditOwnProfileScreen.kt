@@ -176,6 +176,12 @@ fun EditOwnProfileScreen(
 				Spacer(Modifier.height(16.dp))
 
 				TextButton(onClick = {
+					navController.navigate()
+				}) {
+
+				}
+
+				TextButton(onClick = {
 					if (extendedInfo) {
 						navController.navigate(
 							Screen.ExtendedInfo
