@@ -1,5 +1,6 @@
 package com.team.ian.ui.screens.profile
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,9 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Code
@@ -35,28 +36,33 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import android.content.Intent
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.graphics.Color
+import androidx.core.net.toUri
 import com.team.ian.ui.components.ProfileSection
 import com.team.ian.service.AuthService
 import com.team.ian.ui.navigation.Screen
 import com.team.ian.data.repo.AlumniRepo
+import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.components.InfoRow
 
 @Composable
@@ -64,14 +70,23 @@ fun ProfileScreen(
     navController: NavController,
     alumniRepo: AlumniRepo = AlumniRepo.getInstance()
 ) {
-    val context = LocalContext.current
     val authService = AuthService.getInstance()
+    val context = LocalContext.current
     val user = authService.user.collectAsStateWithLifecycle().value
 
     val viewModel: ProfileViewModel = viewModel()
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
     val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
     val contactLinks = viewModel.contactLinks.collectAsStateWithLifecycle().value
+    val showColorPicker = remember { mutableStateOf(false) }
+    val colorOptions = listOf(
+        "blue" to Color.Blue,
+        "green" to Color.Green,
+        "red" to Color.Red,
+        "cyan" to Color.Cyan,
+        "magenta" to Color.Magenta,
+        "yellow" to Color.Yellow
+    )
 
     LaunchedEffect(Unit) {
         viewModel.loadAlumniProfile()
@@ -133,35 +148,12 @@ fun ProfileScreen(
                 Box(
                     modifier = Modifier
                         .size(140.dp)
-                        .clip(CircleShape)
                 ) {
-                    if (alumni.photoURL.isNotBlank()) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(context)
-                                .data(alumni.photoURL)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "Profile photo",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant,
-                                    CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "No profile photo",
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+                    Avatar(
+                        name = alumni.fullName,
+                        modifier = Modifier.fillMaxSize(),
+                        colorName = alumni.avatarColor.ifBlank { null }
+                    )
                 }
 
                 Text(
@@ -171,10 +163,25 @@ fun ProfileScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(Modifier.height(8.dp))
+                TextButton(
+                    onClick = { showColorPicker.value = true }
+                ) {
+                    Icon(
+                        Icons.Filled.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.size(6.dp))
+                    Text("Edit avatar color")
+                }
 
                 ProfileSection(title = "Basic Information", icon = Icons.Filled.Person) {
-                    InfoRow("Email", alumni.email, Icons.Filled.Email)
+                    InfoRow(
+                        "Email",
+                        alumni.email,
+                        Icons.Filled.Email,
+                        onClick = { openEmail(context, alumni.email) }
+                    )
                     InfoRow(
                         "Graduation Year",
                         alumni.graduationYear.toString(),
@@ -195,9 +202,24 @@ fun ProfileScreen(
                 }
 
                 ProfileSection(title = "Contact Links", icon = Icons.Outlined.Link) {
-                    InfoRow("Phone", contactLinks.phoneNumber, Icons.Filled.Phone)
-                    InfoRow("LinkedIn", contactLinks.linkedIn, Icons.Outlined.Link)
-                    InfoRow("GitHub", contactLinks.github, Icons.Outlined.Code)
+                    InfoRow(
+                        "Phone",
+                        contactLinks.phoneNumber,
+                        Icons.Filled.Phone,
+                        onClick = { dialPhone(context, contactLinks.phoneNumber) }
+                    )
+                    InfoRow(
+                        "LinkedIn",
+                        contactLinks.linkedIn,
+                        Icons.Outlined.Link,
+                        onClick = { openUrl(context, contactLinks.linkedIn) }
+                    )
+                    InfoRow(
+                        "GitHub",
+                        contactLinks.github,
+                        Icons.Outlined.Code,
+                        onClick = { openUrl(context, contactLinks.github) }
+                    )
                 }
 
                 ProfileSection(title = "Extended Information", icon = Icons.Filled.Person) {
@@ -321,6 +343,36 @@ fun ProfileScreen(
             }
         }
     }
+
+    if (showColorPicker.value) {
+        AlertDialog(
+            onDismissRequest = { showColorPicker.value = false },
+            title = { Text("Choose Avatar Color") },
+            text = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    colorOptions.forEach { (name, color) ->
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(color, RoundedCornerShape(18.dp))
+                                .clickable {
+                                    viewModel.updateAvatarColor(name)
+                                    showColorPicker.value = false
+                                }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showColorPicker.value = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -370,7 +422,7 @@ private fun JobHistoryChips(jobs: List<String>) {
 
 @Composable
 private fun JobChip(text: String) {
-    Card(
+	Card(
         colors = androidx.compose.material3.CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
         ),
@@ -382,5 +434,27 @@ private fun JobChip(text: String) {
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
         )
-    }
+	}
+}
+
+private fun openEmail(context: Context, email: String) {
+	if (email.isBlank()) return
+	val intent = Intent(Intent.ACTION_SENDTO).apply {
+		data = "mailto:$email".toUri()
+	}
+	context.startActivity(intent)
+}
+
+private fun openUrl(context: Context, rawUrl: String) {
+	if (rawUrl.isBlank()) return
+	val url = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
+	val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+	context.startActivity(intent)
+}
+
+private fun dialPhone(context: Context, phone: String) {
+	if (phone.isBlank()) return
+	val cleaned = phone.replace(" ", "")
+	val intent = Intent(Intent.ACTION_DIAL, "tel:$cleaned".toUri())
+	context.startActivity(intent)
 }

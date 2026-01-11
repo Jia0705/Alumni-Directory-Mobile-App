@@ -73,4 +73,17 @@ class ProfileViewModel(
             }
         }
     }
+
+    fun updateAvatarColor(color: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                userId?.let {
+                    alumniRepo.updateProfile(it, mapOf("avatarColor" to color))
+                    _alumni.value = _alumni.value.copy(avatarColor = color)
+                }
+            } catch (e: Exception) {
+                Log.d("debugging", e.toString())
+            }
+        }
+    }
 }

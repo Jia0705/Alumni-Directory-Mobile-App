@@ -33,7 +33,8 @@ data class Alumni(
     val showEmail: Boolean = true,
 	val showPhone: Boolean = true,
 	val showLinkedIn: Boolean = true,
-	val showGithub: Boolean = true,
+    val showGithub: Boolean = true,
+    val avatarColor: String = "",
 
     // FCM token
     val token: String = "",
