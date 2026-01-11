@@ -1,6 +1,6 @@
 package com.team.ian.ui.screens.viewProfile
 
-import androidx.compose.foundation.background
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,9 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import android.content.Intent
+import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.components.InfoRow
+import androidx.core.net.toUri
 
 @Composable
 fun ViewProfileScreen(
@@ -72,35 +73,12 @@ fun ViewProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.4f)
                         .aspectRatio(1f)
-                        .clip(CircleShape)
                 ) {
-                    if (alumni.photoURL.isNotBlank()) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(context)
-                                .data(alumni.photoURL)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "Profile photo",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant,
-                                    CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "No profile photo",
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+                    Avatar(
+                        name = alumni.fullName,
+                        modifier = Modifier.fillMaxSize(),
+                        colorName = alumni.avatarColor.ifBlank { null }
+                    )
                 }
 
                 Spacer(Modifier.height(24.dp))
@@ -122,10 +100,9 @@ fun ViewProfileScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (alumni.showEmail) {
-                        InfoRow(
-                            "Email", alumni.email,
-                            icon = Icons.Default.Email
-                        )
+                        InfoRow("Email", alumni.email,
+                            icon = Icons.Default.Email,
+                            onClick = { openEmail(context, alumni.email) })
                     }
                     InfoRow(
                         "Graduation Year",
@@ -181,13 +158,28 @@ fun ViewProfileScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         if (alumni.showLinkedIn && alumni.linkedin.isNotBlank()) {
-                            InfoRow("LinkedIn", alumni.linkedin, Icons.Filled.Email)
+                            InfoRow(
+                                "LinkedIn",
+                                alumni.linkedin,
+                                Icons.Filled.Email,
+                                onClick = { openUrl(context, alumni.linkedin) }
+                            )
                         }
                         if (alumni.showGithub && alumni.github.isNotBlank()) {
-                            InfoRow("GitHub", alumni.github, Icons.Filled.Email)
+                            InfoRow(
+                                "GitHub",
+                                alumni.github,
+                                Icons.Filled.Email,
+                                onClick = { openUrl(context, alumni.github) }
+                            )
                         }
                         if (alumni.showPhone && alumni.phone.isNotBlank()) {
-                            InfoRow("Phone", alumni.phone, Icons.Filled.Phone)
+                            InfoRow(
+                                "Phone",
+                                alumni.phone,
+                                Icons.Filled.Phone,
+                                onClick = { dialPhone(context, alumni.phone) }
+                            )
                         }
                     }
                 }
@@ -224,4 +216,26 @@ fun ViewProfileScreen(
             }
         }
     }
+}
+
+private fun openEmail(context: Context, email: String) {
+    if (email.isBlank()) return
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = "mailto:$email".toUri()
+    }
+    context.startActivity(intent)
+}
+
+private fun openUrl(context: Context, rawUrl: String) {
+    if (rawUrl.isBlank()) return
+    val url = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    context.startActivity(intent)
+}
+
+private fun dialPhone(context: Context, phone: String) {
+    if (phone.isBlank()) return
+    val cleaned = phone.replace(" ", "")
+    val intent = Intent(Intent.ACTION_DIAL, "tel:$cleaned".toUri())
+    context.startActivity(intent)
 }

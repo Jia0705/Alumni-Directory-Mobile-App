@@ -1,6 +1,5 @@
 package com.team.ian.ui.screens.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,12 +18,10 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -45,14 +42,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.navigation.Screen
 
 @Composable
@@ -65,8 +59,6 @@ fun HomeScreen(
 	val selectedStack = viewModel.selectedStack.collectAsStateWithLifecycle().value
 	val selectedCountry = viewModel.selectedCountry.collectAsStateWithLifecycle().value
 	val selectedYear = viewModel.selectedYear.collectAsStateWithLifecycle().value
-	val context = LocalContext.current
-
 	val stacks = viewModel.availableStacks.collectAsStateWithLifecycle().value
 	val countries = viewModel.availableCountries.collectAsStateWithLifecycle().value
 	val years = viewModel.availableYears.collectAsStateWithLifecycle().value
@@ -191,36 +183,12 @@ fun HomeScreen(
 											modifier = Modifier
 												.fillMaxWidth(0.8f)
 												.aspectRatio(1f)
-												.clip(CircleShape)
 										) {
-											if (it.photoURL.isNotBlank()) {
-												AsyncImage(
-													model = ImageRequest.Builder(context)
-														.data(it.photoURL)
-														.crossfade(true)
-														.build(),
-													contentDescription = "Profile photo",
-													modifier = Modifier
-														.fillMaxSize()
-												)
-											} else {
-												Box(
-													modifier = Modifier
-														.fillMaxSize()
-														.background(
-															MaterialTheme.colorScheme.surfaceVariant,
-															CircleShape
-														),
-													contentAlignment = Alignment.Center
-												) {
-													Icon(
-														imageVector = Icons.Default.Person,
-														contentDescription = "No profile photo",
-														modifier = Modifier.size(36.dp),
-														tint = MaterialTheme.colorScheme.surfaceVariant
-													)
-												}
-											}
+											Avatar(
+												name = it.fullName,
+												modifier = Modifier.fillMaxSize(),
+												colorName = it.avatarColor.ifBlank { null }
+											)
 										}
 										Spacer(modifier = Modifier.height(16.dp))
 										Text(
