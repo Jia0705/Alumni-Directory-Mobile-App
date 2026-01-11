@@ -122,8 +122,10 @@ fun ViewProfileScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (alumni.showEmail) {
-                        InfoRow("Email", alumni.email,
-                            icon = Icons.Default.Email)
+                        InfoRow(
+                            "Email", alumni.email,
+                            icon = Icons.Default.Email
+                        )
                     }
                     InfoRow(
                         "Graduation Year",
@@ -211,7 +213,11 @@ fun ViewProfileScreen(
                             InfoRow("Skills", alumni.skills.joinToString(", "), Icons.Filled.Email)
                         }
                         if (alumni.pastJobHistory.isNotEmpty()) {
-                            InfoRow("Work Experience", alumni.pastJobHistory.joinToString(", "), Icons.Filled.Email)
+                            InfoRow(
+                                "Work Experience/Job History",
+                                alumni.pastJobHistory.joinToString(", "),
+                                Icons.Filled.Email
+                            )
                         }
                     }
                 }

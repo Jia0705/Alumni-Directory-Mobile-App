@@ -201,7 +201,7 @@ class AlumniRepoRealImpl : AlumniRepo {
             .get()
             .await()
             .getValue(ExtendedInfo::class.java)
-//		Log.d("debugging", "getExtendedInfo for uid=$uid: $result")
+        Log.d("debugging", "extended info (${result.toString()})")
         return result
     }
 
@@ -217,7 +217,7 @@ class AlumniRepoRealImpl : AlumniRepo {
             .get()
             .await()
             .getValue(ContactLinks::class.java)
-//		Log.d("debugging", "getExtendedInfo for uid=$uid: $result")
+		Log.d("debugging", "contact links (${result.toString()})")
         return result
     }
 

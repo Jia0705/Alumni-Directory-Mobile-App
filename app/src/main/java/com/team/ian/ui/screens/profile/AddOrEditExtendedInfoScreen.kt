@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.ui.screens.utils.setRefresh
 
@@ -49,7 +50,7 @@ import com.team.ian.ui.screens.utils.setRefresh
 fun AddOrEditExtendedInfoScreen(
 	navController: NavController
 ) {
-	val viewModel: AddOrEditExtendedInfoViewModel = viewModel()
+	val viewModel: AddOrEditExtendedInfoViewModel = hiltViewModel()
 	val extendedInfo by viewModel.extendedInfo.collectAsStateWithLifecycle()
 	var shortBio by remember { mutableStateOf("") }
 	var skills by remember { mutableStateOf(listOf("")) }

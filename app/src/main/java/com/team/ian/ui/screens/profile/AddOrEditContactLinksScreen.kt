@@ -43,13 +43,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.ContactLinks
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
 fun AddOrEditContactLinksScreen(navController: NavController) {
-    val viewModel: AddOrEditContactLinksViewModel = viewModel()
+    val viewModel: AddOrEditContactLinksViewModel = hiltViewModel()
     val contactLinks by viewModel.contactLinks.collectAsStateWithLifecycle()
     var linkedIn by remember { mutableStateOf("") }
     var github by remember { mutableStateOf("") }

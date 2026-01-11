@@ -267,7 +267,7 @@ fun EditOwnProfileScreen(
 				TextButton(
 					onClick = {
 						navController.navigate(
-							Screen.AddOrEditContactLinks
+							Screen.AddOrEditContactLinks(alumni.uid)
 						)
 					},
 					modifier = Modifier.fillMaxWidth()
