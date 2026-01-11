@@ -88,7 +88,7 @@ fun ExtendedInfoScreen(navController: NavController) {
 				.weight(1f)
 				.verticalScroll(rememberScrollState())
 				.padding(horizontal = 16.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp)
+			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 
 			ProfileSection(
@@ -177,7 +177,7 @@ fun ExtendedInfoScreen(navController: NavController) {
 				}
 				Button(
 					onClick = {
-						navController.navigate(Screen.AddOrEditExtendedInfo)
+						navController.navigate(Screen.AddOrEditExtendedInfo(extendedInfo.uid))
 					},
 					modifier = Modifier
 						.weight(1f)
@@ -191,7 +191,7 @@ fun ExtendedInfoScreen(navController: NavController) {
 					)
 					Spacer(modifier = Modifier.size(8.dp))
 					Text(
-						text = "Edit Profile",
+						text = "Edit",
 						style = MaterialTheme.typography.titleMedium
 					)
 				}
@@ -225,12 +225,12 @@ private fun ProfileChip(
 		modifier = modifier
 			.clip(RoundedCornerShape(20.dp))
 			.background(MaterialTheme.colorScheme.primaryContainer)
-			.padding(horizontal = 16.dp, vertical = 8.dp)
+			.padding(horizontal = 18.dp, vertical = 10.dp)
 	) {
 		Text(
 			text = text,
-			style = MaterialTheme.typography.bodyMedium,
-			fontWeight = FontWeight.Medium,
+			style = MaterialTheme.typography.labelLarge,
+			fontWeight = FontWeight.SemiBold,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 	}
@@ -253,15 +253,15 @@ private fun JobHistoryItem(
 			if (!isFirst) {
 				Box(
 					modifier = Modifier
-						.width(2.dp)
-						.height(12.dp)
-						.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+						.width(3.dp)
+						.height(14.dp)
+						.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
 				)
 			}
 
 			Box(
 				modifier = Modifier
-					.size(12.dp)
+					.size(14.dp)
 					.clip(CircleShape)
 					.background(MaterialTheme.colorScheme.primary)
 			)
@@ -269,26 +269,28 @@ private fun JobHistoryItem(
 			if (!isLast) {
 				Box(
 					modifier = Modifier
-						.width(2.dp)
+						.width(3.dp)
 						.weight(1f)
-						.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+						.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
 				)
 			}
 		}
 
 		Card(
 			modifier = Modifier
-				.padding(start = 12.dp)
+				.padding(start = 14.dp)
 				.fillMaxWidth(),
 			colors = CardDefaults.cardColors(
-				containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+				containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
 			),
-			shape = RoundedCornerShape(12.dp)
+			shape = RoundedCornerShape(12.dp),
+			elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
 		) {
 			Text(
 				text = job,
 				style = MaterialTheme.typography.bodyLarge,
-				modifier = Modifier.padding(12.dp)
+				fontWeight = FontWeight.Medium,
+				modifier = Modifier.padding(14.dp)
 			)
 		}
 	}
