@@ -9,6 +9,7 @@ import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
 import com.team.ian.data.model.ContactLinks
 import com.team.ian.data.model.ExtendedInfo
+import com.team.ian.data.model.Role
 import com.team.ian.data.repo.AlumniRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -85,6 +86,11 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
     fun resetAllStates() {
         getAlumniById()
     }
+	fun updateAlumniRole(updatedRole: Role) {
+		val current = _alumni.value
+		_alumni.value = current.copy(role = updatedRole)
+	}
+
 
     fun finishEditing() {
         val updatedAlumni = _alumni.value
@@ -117,7 +123,8 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
                     "primaryStack" to updatedAlumni.primaryStack,
                     "city" to updatedAlumni.city,
                     "country" to updatedAlumni.country,
-                    "status" to updatedAlumni.status
+                    "status" to updatedAlumni.status,
+                    "role" to updatedAlumni.role
                 )
                 alumniRepo.updateProfile(alumniId, updates)
                 _finish.emit(Unit)
