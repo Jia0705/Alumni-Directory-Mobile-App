@@ -5,18 +5,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.ContactLinks
 import com.team.ian.data.repo.AlumniRepo
-import com.team.ian.service.AuthService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import androidx.lifecycle.SavedStateHandle
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AddOrEditContactLinksViewModel(
-    private val alumniRepo: AlumniRepo = AlumniRepo.getInstance(),
-    private val authService: AuthService = AuthService.getInstance()
+@HiltViewModel
+class AddOrEditContactLinksViewModel @Inject constructor(
+    private val alumniRepo: AlumniRepo,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val alumniId = savedStateHandle.get<String>("alumniId")!!
     private val _contactLinks = MutableStateFlow<ContactLinks?>(null)
     val contactLinks = _contactLinks.asStateFlow()
     private val _finish = MutableSharedFlow<Unit>()
@@ -31,34 +35,28 @@ class AddOrEditContactLinksViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val userId = authService.getCurrentUser()?.id
-                userId?.let {
-                    alumniRepo.addContactLinks(
-                        ContactLinks(
-                            uid = userId,
-                            linkedIn = contactLinks.linkedIn,
-                            github = contactLinks.github,
-                            phoneNumber = contactLinks.phoneNumber
-                        )
+                alumniRepo.addContactLinks(
+                    ContactLinks(
+                        uid = alumniId,
+                        linkedIn = contactLinks.linkedIn,
+                        github = contactLinks.github,
+                        phoneNumber = contactLinks.phoneNumber
                     )
-                    _finish.emit(Unit)
-                }
+                )
+                _finish.emit(Unit)
             } catch (e: Exception) {
                 Log.d("debugging", e.toString())
             }
         }
     }
 
-    fun getContactLinks(){
+    fun getContactLinks() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val userId = authService.getCurrentUser()?.id
-                userId?.let {
-                    alumniRepo.getContactLinks(userId)?.let { contactLinks ->
-                        _contactLinks.value = contactLinks
-                    }
+                alumniRepo.getContactLinks(alumniId)?.let { contactLinks ->
+                    _contactLinks.value = contactLinks
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Log.d("debugging", e.toString())
             }
         }

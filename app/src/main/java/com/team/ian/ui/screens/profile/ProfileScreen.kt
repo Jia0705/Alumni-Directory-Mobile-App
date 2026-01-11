@@ -64,6 +64,8 @@ import com.team.ian.ui.navigation.Screen
 import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.components.InfoRow
+import com.team.ian.ui.components.JobHistoryChips
+import com.team.ian.ui.components.SkillsChipRow
 
 @Composable
 fun ProfileScreen(
