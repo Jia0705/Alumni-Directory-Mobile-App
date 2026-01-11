@@ -22,7 +22,7 @@ class EditOwnProfileViewModel(
 	private val _alumni = MutableStateFlow(Alumni())
 	val alumni = _alumni.asStateFlow()
 
-	private val _extendedInfo = MutableStateFlow(false)
+	private val _extendedInfo = MutableStateFlow(ExtendedInfo())
 	val extendedInfo = _extendedInfo.asStateFlow()
 
 	private val _finish = MutableSharedFlow<Unit>()
@@ -30,7 +30,7 @@ class EditOwnProfileViewModel(
 
 	init {
 		loadProfile()
-		checkForExtendedInfo()
+		getExtendedInfo()
 	}
 
     fun loadProfile() {
@@ -103,13 +103,13 @@ class EditOwnProfileViewModel(
 		}
 	}
 
-	fun checkForExtendedInfo() {
+	fun getExtendedInfo() {
 		viewModelScope.launch(Dispatchers.IO) {
 			try {
 				val userId = authService.getCurrentUser()?.id
 				userId?.let {
-					alumniRepo.getExtendedInfo(userId)?.let {
-						_extendedInfo.value = true
+					alumniRepo.getExtendedInfo(it)?.let { info ->
+						_extendedInfo.value = info
 					}
 				}
 			} catch (e: Exception) {

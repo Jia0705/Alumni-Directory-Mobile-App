@@ -5,32 +5,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Grade
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +39,9 @@ import androidx.navigation.NavController
 import android.content.Intent
 import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.components.InfoRow
+import com.team.ian.ui.components.JobHistoryChips
+import com.team.ian.ui.components.ProfileSection
+import com.team.ian.ui.components.SkillsChipRow
 import androidx.core.net.toUri
 
 @Composable
@@ -50,171 +52,163 @@ fun ViewProfileScreen(
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
     val context = LocalContext.current
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(4.dp),
-            shape = RoundedCornerShape(16.dp)
+        Spacer(Modifier.height(64.dp))
+
+        // Profile Photo
+        Box(
+            modifier = Modifier.size(140.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Profile Photo
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.4f)
-                        .aspectRatio(1f)
-                ) {
-                    Avatar(
-                        name = alumni.fullName,
-                        modifier = Modifier.fillMaxSize(),
-                        colorName = alumni.avatarColor.ifBlank { null }
-                    )
-                }
+            Avatar(
+                name = alumni.fullName,
+                modifier = Modifier.fillMaxSize(),
+                colorName = alumni.avatarColor.ifBlank { null }
+            )
+        }
 
-                Spacer(Modifier.height(24.dp))
+        Text(
+            text = alumni.fullName,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
 
-                Text(
-                    text = alumni.fullName,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+        Spacer(Modifier.height(8.dp))
+
+        ProfileSection(title = "Basic Information", icon = Icons.Filled.Person) {
+            if (alumni.showEmail) {
+                InfoRow(
+                    "Email",
+                    alumni.email,
+                    Icons.Filled.Email,
+                    onClick = { openEmail(context, alumni.email) }
                 )
+            }
+            InfoRow(
+                "Graduation Year",
+                alumni.graduationYear.toString(),
+                Icons.Filled.School
+            )
+            InfoRow("Department", alumni.department, Icons.Filled.School)
+        }
 
-                Spacer(Modifier.height(24.dp))
-                HorizontalDivider()
-                Spacer(Modifier.height(16.dp))
+        ProfileSection(title = "Professional Information", icon = Icons.Filled.Work) {
+            InfoRow("Job Title", alumni.jobTitle, Icons.Filled.Work)
+            InfoRow("Company", alumni.company, Icons.Filled.Business)
+            InfoRow("Tech Stack", alumni.primaryStack, Icons.Filled.Code)
+        }
 
-                // Basic Info
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    if (alumni.showEmail) {
-                        InfoRow("Email", alumni.email,
-                            icon = Icons.Default.Email,
-                            onClick = { openEmail(context, alumni.email) })
-                    }
+        ProfileSection(title = "Location", icon = Icons.Filled.LocationOn) {
+            InfoRow("City", alumni.city, Icons.Filled.LocationCity)
+            InfoRow("Country", alumni.country, Icons.Filled.Public)
+        }
+
+        if ((alumni.showLinkedIn && alumni.linkedin.isNotBlank()) ||
+            (alumni.showGithub && alumni.github.isNotBlank()) ||
+            (alumni.showPhone && alumni.phone.isNotBlank())
+        ) {
+            ProfileSection(title = "Contact Links", icon = Icons.Outlined.Link) {
+                if (alumni.showPhone && alumni.phone.isNotBlank()) {
                     InfoRow(
-                        "Graduation Year",
-                        alumni.graduationYear.toString(),
-                        icon = Icons.Default.Grade
+                        "Phone",
+                        alumni.phone,
+                        Icons.Filled.Phone,
+                        onClick = { dialPhone(context, alumni.phone) }
                     )
+                }
+                if (alumni.showLinkedIn && alumni.linkedin.isNotBlank()) {
                     InfoRow(
-                        "Department",
-                        alumni.department,
-                        icon = Icons.Default.LocalFireDepartment
+                        "LinkedIn",
+                        alumni.linkedin,
+                        Icons.Outlined.Link,
+                        onClick = { openUrl(context, alumni.linkedin) }
                     )
                 }
-
-                Spacer(Modifier.height(16.dp))
-                HorizontalDivider()
-                Spacer(Modifier.height(16.dp))
-
-                // Professional Info
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    InfoRow("Job Title", alumni.jobTitle, Icons.Filled.Email)
-                    InfoRow("Company", alumni.company, Icons.Filled.Email)
-                    InfoRow("Tech Stack", alumni.primaryStack, Icons.Filled.Email)
+                if (alumni.showGithub && alumni.github.isNotBlank()) {
+                    InfoRow(
+                        "GitHub",
+                        alumni.github,
+                        Icons.Outlined.Code,
+                        onClick = { openUrl(context, alumni.github) }
+                    )
                 }
+            }
+        }
 
-                Spacer(Modifier.height(16.dp))
-                HorizontalDivider()
-                Spacer(Modifier.height(16.dp))
-
-                // Location
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    InfoRow("City", alumni.city, Icons.Filled.Email)
-                    InfoRow("Country", alumni.country, Icons.Filled.Email)
-                }
-
-                if (
-                    (alumni.showLinkedIn && alumni.linkedin.isNotBlank()) ||
-                    (alumni.showGithub && alumni.github.isNotBlank()) ||
-                    (alumni.showPhone && alumni.phone.isNotBlank())
-                ) {
-                    Spacer(Modifier.height(16.dp))
-                    HorizontalDivider()
-                    Spacer(Modifier.height(16.dp))
-
-                    // Contact Methods
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        if (alumni.showLinkedIn && alumni.linkedin.isNotBlank()) {
-                            InfoRow(
-                                "LinkedIn",
-                                alumni.linkedin,
-                                Icons.Filled.Email,
-                                onClick = { openUrl(context, alumni.linkedin) }
-                            )
-                        }
-                        if (alumni.showGithub && alumni.github.isNotBlank()) {
-                            InfoRow(
-                                "GitHub",
-                                alumni.github,
-                                Icons.Filled.Email,
-                                onClick = { openUrl(context, alumni.github) }
-                            )
-                        }
-                        if (alumni.showPhone && alumni.phone.isNotBlank()) {
-                            InfoRow(
-                                "Phone",
-                                alumni.phone,
-                                Icons.Filled.Phone,
-                                onClick = { dialPhone(context, alumni.phone) }
-                            )
-                        }
+        if (alumni.shortBio.isNotBlank() ||
+            alumni.skills.isNotEmpty() ||
+            alumni.pastJobHistory.isNotEmpty()
+        ) {
+            ProfileSection(title = "Extended Information", icon = Icons.Filled.Person) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    if (alumni.shortBio.isNotBlank()) {
+                        Text(
+                            text = "Short Bio",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = alumni.shortBio,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                }
 
-                if (
-                    alumni.shortBio.isNotBlank() ||
-                    alumni.skills.isNotEmpty() ||
-                    alumni.pastJobHistory.isNotEmpty()
-                ) {
-                    Spacer(Modifier.height(16.dp))
-                    HorizontalDivider()
-                    Spacer(Modifier.height(16.dp))
-
-                    // Extended Info
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        if (alumni.shortBio.isNotBlank()) {
-                            InfoRow("About", alumni.shortBio, Icons.Filled.Email)
-                        }
-                        if (alumni.skills.isNotEmpty()) {
-                            InfoRow("Skills", alumni.skills.joinToString(", "), Icons.Filled.Email)
-                        }
-                        if (alumni.pastJobHistory.isNotEmpty()) {
-                            InfoRow(
-                                "Work Experience/Job History",
-                                alumni.pastJobHistory.joinToString(", "),
-                                Icons.Filled.Email
+                    if (alumni.skills.isNotEmpty()) {
+                        Text(
+                            text = "Skills",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        val skills = alumni.skills.filter { it.isNotBlank() }
+                        if (skills.isEmpty()) {
+                            Text(
+                                text = "No skills added yet",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
+                        } else {
+                            SkillsChipRow(skills = skills)
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    if (alumni.pastJobHistory.isNotEmpty()) {
+                        Text(
+                            text = "Work Experience",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        val jobs = alumni.pastJobHistory.filter { it.isNotBlank() }
+                        if (jobs.isEmpty()) {
+                            Text(
+                                text = "No work experience added yet",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        } else {
+                            JobHistoryChips(jobs = jobs)
                         }
                     }
                 }
             }
         }
+
+        Spacer(Modifier.height(16.dp))
     }
 }
 

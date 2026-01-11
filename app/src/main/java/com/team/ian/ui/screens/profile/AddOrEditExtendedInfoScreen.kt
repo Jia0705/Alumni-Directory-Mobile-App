@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.ui.screens.utils.setRefresh
@@ -106,8 +105,8 @@ fun AddOrEditExtendedInfoScreen(
 			.fillMaxSize()
 	) {
 		Text(
-			modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 5.dp),
-			text = "Edit Extended Profile",
+			modifier = Modifier.padding(start = 16.dp, top = 40.dp, bottom = 15.dp),
+			text = "Edit Extended Information",
 			style = MaterialTheme.typography.headlineMedium,
 			fontWeight = FontWeight.Bold,
 			color = MaterialTheme.colorScheme.primary,
@@ -220,16 +219,16 @@ fun AddOrEditExtendedInfoScreen(
 											updatedList.removeAt(index)
 											skills = updatedList
 										},
-										modifier = Modifier.size(56.dp),
-										shape = RoundedCornerShape(12.dp),
-										colors = ButtonDefaults.outlinedButtonColors(
-											contentColor = MaterialTheme.colorScheme.error
-										)
-									) {
-										Icon(
-											Icons.Default.Delete,
-											contentDescription = "Remove",
-											modifier = Modifier.size(20.dp)
+									modifier = Modifier.height(56.dp),
+									shape = RoundedCornerShape(12.dp),
+									colors = ButtonDefaults.outlinedButtonColors(
+										contentColor = MaterialTheme.colorScheme.error
+									)
+								) {
+									Icon(
+										Icons.Default.Delete,
+										contentDescription = "Remove",
+										modifier = Modifier.size(20.dp)
 										)
 									}
 								}
@@ -322,16 +321,16 @@ fun AddOrEditExtendedInfoScreen(
 											updatedList.removeAt(index)
 											pastJobHistory = updatedList
 										},
-										modifier = Modifier.size(56.dp),
-										shape = RoundedCornerShape(12.dp),
-										colors = ButtonDefaults.outlinedButtonColors(
-											contentColor = MaterialTheme.colorScheme.error
-										)
-									) {
-										Icon(
-											Icons.Default.Delete,
-											contentDescription = "Remove",
-											modifier = Modifier.size(20.dp)
+									modifier = Modifier.height(56.dp),
+									shape = RoundedCornerShape(12.dp),
+									colors = ButtonDefaults.outlinedButtonColors(
+										contentColor = MaterialTheme.colorScheme.error
+									)
+								) {
+									Icon(
+										Icons.Default.Delete,
+										contentDescription = "Remove",
+										modifier = Modifier.size(20.dp)
 										)
 									}
 								}

@@ -289,15 +289,9 @@ fun EditOwnProfileScreen(
             ) {
                 TextButton(
                     onClick = {
-                        if (extendedInfo) {
-                            navController.navigate(
-                                Screen.ExtendedInfo(alumni.uid)
-                            )
-                        } else {
-                            navController.navigate(
-                                Screen.AddOrEditExtendedInfo(alumni.uid)
-                            )
-                        }
+                        navController.navigate(
+                            Screen.AddOrEditExtendedInfo(alumni.uid)
+                        )
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -306,7 +300,7 @@ fun EditOwnProfileScreen(
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text("Manage Extended Information")
+                    Text("Manage Extended Info")
                 }
             }
 
