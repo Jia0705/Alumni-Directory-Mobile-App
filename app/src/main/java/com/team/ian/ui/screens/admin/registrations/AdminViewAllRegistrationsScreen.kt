@@ -121,6 +121,26 @@ fun AdminViewAllRegistrationsScreen(
 									maxLines = 1,
 									overflow = TextOverflow.Ellipsis
 								)
+
+								Spacer(Modifier.height(4.dp))
+
+								Text(
+									text = "Year ${alumni.graduationYear} • ${alumni.department}",
+									style = MaterialTheme.typography.bodySmall,
+									color = MaterialTheme.colorScheme.onSurfaceVariant,
+									maxLines = 1,
+									overflow = TextOverflow.Ellipsis
+								)
+
+								Spacer(Modifier.height(4.dp))
+
+								Text(
+									text = "${alumni.city}, ${alumni.country} • ${alumni.primaryStack}",
+									style = MaterialTheme.typography.bodySmall,
+									color = MaterialTheme.colorScheme.onSurfaceVariant,
+									maxLines = 1,
+									overflow = TextOverflow.Ellipsis
+								)
 							}
 						}
 					}

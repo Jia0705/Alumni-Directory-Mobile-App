@@ -60,8 +60,10 @@ class AdminManageAlumniViewModel(
 		viewModelScope.launch(Dispatchers.IO) {
 			try {
 				val currentUserId = authService.getCurrentUser()?.id
-				alumniRepo.getAllAlumniExceptForPending().collect { allAlumni ->
-					val filtered = allAlumni.filter { it.uid != currentUserId }
+				alumniRepo.getAllUsers().collect { allUsers ->
+					val filtered = allUsers.filter { 
+						it.status != AccountStatus.PENDING && it.uid != currentUserId
+					}
 					_allAlumni.value = filtered
 					_availableStacks.value = AlumniFilter.extractStacks(filtered)
 					_availableCountries.value = AlumniFilter.extractCountries(filtered)

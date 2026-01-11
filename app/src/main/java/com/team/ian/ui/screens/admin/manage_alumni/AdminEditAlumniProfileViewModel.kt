@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
+import com.team.ian.data.model.Role
 import com.team.ian.data.repo.AlumniRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +85,11 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 		_alumni.value = current.copy(status = updatedStatus)
 	}
 
+	fun updateAlumniRole(updatedRole: Role) {
+		val current = _alumni.value
+		_alumni.value = current.copy(role = updatedRole)
+	}
+
 	fun resetAllStates() {
 		getAlumniById(alumniId)
 	}
@@ -124,7 +130,8 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
 					"shortBio" to updatedAlumni.shortBio,
 					"skills" to updatedAlumni.skills,
 					"pastJobHistory" to updatedAlumni.pastJobHistory,
-					"status" to updatedAlumni.status
+					"status" to updatedAlumni.status,
+					"role" to updatedAlumni.role
 				)
 				alumniRepo.updateProfile(alumniId, updates)
 				_finish.emit(Unit)

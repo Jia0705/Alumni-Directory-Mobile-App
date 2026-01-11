@@ -43,6 +43,7 @@ import com.team.ian.ui.components.InfoTextField
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
+import com.team.ian.data.model.Role
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
@@ -54,6 +55,7 @@ fun AdminEditAlumniProfileScreen(
 	var initialAlumni by remember { mutableStateOf(Alumni()) }
 	var initialSet by remember { mutableStateOf(false) }
 	var showDiscardDialog by remember { mutableStateOf(false) }
+	var pendingRole by remember { mutableStateOf<Role?>(null) }
 
 	LaunchedEffect(Unit) {
 		viewModel.finish.collect {
@@ -289,56 +291,121 @@ fun AdminEditAlumniProfileScreen(
 							.weight(1f)
 							.background(
 								if (alumni.status == AccountStatus.APPROVED) {
-									Color(0xFFD1FAE5)
+									Color.Green
 								} else {
 									Color.Transparent
 								}
 							, RoundedCornerShape(8.dp))
 							.fillMaxHeight()
+							.padding(vertical = 12.dp)
 							.clickable {
 								viewModel.updateAlumniStatusState(AccountStatus.APPROVED)
 							},
 						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
-						Text("Approved")
+						Text(
+							text = "Approved",
+							color = Color.DarkGray,
+							fontWeight = FontWeight.Bold
+						)
 					}
 					Column(
 						Modifier
 							.weight(1f)
 							.background(
 								if (alumni.status == AccountStatus.REJECTED) {
-									Color(0xFFFEE2E2)
+									Color.Red
 								} else {
 									Color.Transparent
 								}
 							, RoundedCornerShape(8.dp))
 							.fillMaxHeight()
+							.padding(vertical = 12.dp)
 							.clickable {
 								viewModel.updateAlumniStatusState(AccountStatus.REJECTED)
 							},
 						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
-						Text("Rejected")
+						Text(
+							text = "Rejected",
+							color = Color.DarkGray,
+							fontWeight = FontWeight.Bold
+						)
 					}
 					Column(
 						Modifier
 							.weight(1f)
 							.background(
 								if (alumni.status == AccountStatus.INACTIVE) {
-									Color(0xFFD1D5DB)
+									Color.Gray
 								} else {
 									Color.Transparent
 								}
 							, RoundedCornerShape(8.dp))
 							.fillMaxHeight()
+							.padding(vertical = 12.dp)
 							.clickable {
 								viewModel.updateAlumniStatusState(AccountStatus.INACTIVE)
 							},
 						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
-						Text("Inactive")
+						Text(
+							text = "Inactive",
+							color = Color.DarkGray,
+							fontWeight = FontWeight.Bold
+						)
 					}
 				}
+
+				Spacer(Modifier.height(16.dp))
+				HorizontalDivider()
+				Spacer(Modifier.height(16.dp))
+
+				Text(
+					text = "Account Role",
+					style = MaterialTheme.typography.titleLarge,
+					fontWeight = FontWeight.Bold
+				)
+				Spacer(Modifier.height(12.dp))
+				Row(
+					modifier = Modifier.fillMaxWidth()
+				) {
+					if (alumni.role == Role.ALUMNI) {
+						Column(
+							Modifier
+								.weight(1f)
+								.background(Color.LightGray, RoundedCornerShape(8.dp))
+								.fillMaxHeight()
+								.padding(vertical = 12.dp)
+								.clickable { pendingRole = Role.ADMIN },
+							horizontalAlignment = Alignment.CenterHorizontally,
+						) {
+						Text(
+							text = "Promote to Admin",
+							color = Color.DarkGray,
+							fontWeight = FontWeight.Bold
+						)
+					}
+					} else {
+						Column(
+							Modifier
+								.weight(1f)
+								.background(Color.Red, RoundedCornerShape(8.dp))
+								.fillMaxHeight()
+								.padding(vertical = 12.dp)
+								.clickable {
+									pendingRole = Role.ALUMNI
+								},
+						horizontalAlignment = Alignment.CenterHorizontally,
+					) {
+						Text(
+							text = "Demote to Alumni",
+							color = Color.White,
+							fontWeight = FontWeight.Bold
+						)
+					}
+				}
+			}
 
 				Spacer(Modifier.height(32.dp))
 
@@ -401,6 +468,34 @@ fun AdminEditAlumniProfileScreen(
 			dismissButton = {
 				TextButton(onClick = { showDiscardDialog = false }) {
 					Text("Keep Editing")
+				}
+			}
+		)
+	}
+
+	if (pendingRole != null) {
+		val nextRole = pendingRole ?: Role.ALUMNI
+		AlertDialog(
+			onDismissRequest = { pendingRole = null },
+			title = { Text("Change role?") },
+			text = {
+				Text(
+					text = "Are you sure you want to set this user to ${nextRole.name.lowercase()}?"
+				)
+			},
+			confirmButton = {
+				TextButton(
+					onClick = {
+						viewModel.updateAlumniRole(nextRole)
+						pendingRole = null
+					}
+				) {
+					Text("Confirm")
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { pendingRole = null }) {
+					Text("Cancel")
 				}
 			}
 		)
