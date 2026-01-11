@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -45,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -203,31 +203,31 @@ fun AdminManageAlumniScreen(
 						items(alumni) {
 							Card(
 								elevation = CardDefaults.cardElevation(4.dp),
-								modifier = Modifier.clickable(onClick = {
-									navController.navigate(Screen.AdminEditAlumniProfile(it.uid))
-								}),
+								shape = RoundedCornerShape(16.dp),
+								modifier = Modifier
+									.fillMaxWidth()
+									.clickable(onClick = {
+										navController.navigate(Screen.AdminEditAlumniProfile(it.uid))
+									}),
 								colors = CardDefaults.cardColors(
 									containerColor = when (it.status) {
-										AccountStatus.APPROVED -> Color.Green.copy(alpha = 0.2f)
-										AccountStatus.INACTIVE -> Color.Gray.copy(alpha = 0.2f)
-										AccountStatus.REJECTED -> Color.Red.copy(alpha = 0.2f)
-										else -> Color.Black
+										AccountStatus.APPROVED -> Color(0xFFE8F5E9)
+										AccountStatus.INACTIVE -> Color(0xFFF5F5F5)
+										AccountStatus.REJECTED -> Color(0xFFFFEBEE)
+										else -> MaterialTheme.colorScheme.surface
 									}
 								)
 							) {
-								Row(
+								Column(
 									modifier = Modifier
-										.fillMaxSize()
-										.padding(16.dp)
+										.fillMaxWidth()
+										.padding(16.dp),
+									verticalArrangement = Arrangement.spacedBy(12.dp),
+									horizontalAlignment = Alignment.CenterHorizontally
 								) {
-									Column(
-										modifier = Modifier.fillMaxSize(),
-										verticalArrangement = Arrangement.spacedBy(5.dp),
-										horizontalAlignment = Alignment.CenterHorizontally
-									) {
 									Box(
 										modifier = Modifier
-											.fillMaxWidth(0.8f)
+											.fillMaxWidth(0.7f)
 											.aspectRatio(1f)
 									) {
 										Avatar(
@@ -236,9 +236,17 @@ fun AdminManageAlumniScreen(
 											colorName = it.avatarColor.ifBlank { null }
 										)
 									}
-										Spacer(modifier = Modifier.height(16.dp))
-										Text("${it.fullName}, ${it.email}")
-									}
+									Text(
+										text = it.fullName,
+										style = MaterialTheme.typography.titleMedium,
+										fontWeight = FontWeight.Bold,
+										color = MaterialTheme.colorScheme.onSurface
+									)
+									Text(
+										text = it.email,
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.onSurfaceVariant
+									)
 								}
 							}
 						}

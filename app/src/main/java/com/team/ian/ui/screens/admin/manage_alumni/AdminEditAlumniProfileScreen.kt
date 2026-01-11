@@ -1,5 +1,7 @@
 package com.team.ian.ui.screens.admin.manage_alumni
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,10 +44,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.Phone
@@ -73,6 +75,7 @@ fun AdminEditAlumniProfileScreen(
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
     val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
     val contactLinks = viewModel.contactLinks.collectAsStateWithLifecycle().value
+    val context = LocalContext.current
     var initialAlumni by remember { mutableStateOf(Alumni()) }
     var initialSet by remember { mutableStateOf(false) }
     var showDiscardDialog by remember { mutableStateOf(false) }
@@ -136,12 +139,6 @@ fun AdminEditAlumniProfileScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-            )
-            Text(
-                text = "These fields cannot be edited",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 8.dp)
             )
             InfoTextField(
                 label = "Full Name",
@@ -274,22 +271,34 @@ fun AdminEditAlumniProfileScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (contactLinks.linkedIn.isBlank() || contactLinks.github.isBlank() || contactLinks.phoneNumber.isBlank()) {
-                    Text("Nothing for now")
+            if (contactLinks.linkedIn.isNotBlank() || contactLinks.github.isNotBlank() || contactLinks.phoneNumber.isNotBlank()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(2.dp),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        if (contactLinks.linkedIn.isNotBlank()) {
+                            InfoRow("LinkedIn", contactLinks.linkedIn, Icons.Outlined.Link)
+                        }
+                        if (contactLinks.github.isNotBlank()) {
+                            InfoRow("GitHub", contactLinks.github, Icons.Outlined.Link)
+                        }
+                        if (contactLinks.phoneNumber.isNotBlank()) {
+                            InfoRow("Phone", contactLinks.phoneNumber, Icons.Filled.Phone)
+                        }
+                    }
                 }
-                if (alumni.showLinkedIn && contactLinks.linkedIn.isNotBlank()) {
-                    InfoRow("LinkedIn", contactLinks.linkedIn, Icons.Filled.Email)
-                }
-                if (alumni.showGithub && contactLinks.github.isNotBlank()) {
-                    InfoRow("GitHub", contactLinks.github, Icons.Filled.Email)
-                }
-                if (alumni.showPhone && contactLinks.phoneNumber.isNotBlank()) {
-                    InfoRow("Phone", contactLinks.phoneNumber, Icons.Filled.Phone)
-                }
+            } else {
+                Text(
+                    text = "No contact methods added yet",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
 
             Spacer(Modifier.height(8.dp))
@@ -392,135 +401,6 @@ fun AdminEditAlumniProfileScreen(
             HorizontalDivider()
             Spacer(Modifier.height(8.dp))
 
-				Text(
-					text = "Account Status",
-					style = MaterialTheme.typography.titleLarge,
-					fontWeight = FontWeight.Bold
-				)
-				Spacer(Modifier.height(12.dp))
-				Row(
-					modifier = Modifier.fillMaxWidth()
-				) {
-					Column(
-						Modifier
-							.weight(1f)
-							.background(
-								if (alumni.status == AccountStatus.APPROVED) {
-									Color.Green
-								} else {
-									Color.Transparent
-								}
-							, RoundedCornerShape(8.dp))
-							.fillMaxHeight()
-							.padding(vertical = 12.dp)
-							.clickable {
-								viewModel.updateAlumniStatusState(AccountStatus.APPROVED)
-							},
-						horizontalAlignment = Alignment.CenterHorizontally,
-					) {
-						Text(
-							text = "Approved",
-							color = Color.DarkGray,
-							fontWeight = FontWeight.Bold
-						)
-					}
-					Column(
-						Modifier
-							.weight(1f)
-							.background(
-								if (alumni.status == AccountStatus.REJECTED) {
-									Color.Red
-								} else {
-									Color.Transparent
-								}
-							, RoundedCornerShape(8.dp))
-							.fillMaxHeight()
-							.padding(vertical = 12.dp)
-							.clickable {
-								viewModel.updateAlumniStatusState(AccountStatus.REJECTED)
-							},
-						horizontalAlignment = Alignment.CenterHorizontally,
-					) {
-						Text(
-							text = "Rejected",
-							color = Color.DarkGray,
-							fontWeight = FontWeight.Bold
-						)
-					}
-					Column(
-						Modifier
-							.weight(1f)
-							.background(
-								if (alumni.status == AccountStatus.INACTIVE) {
-									Color.Gray
-								} else {
-									Color.Transparent
-								}
-							, RoundedCornerShape(8.dp))
-							.fillMaxHeight()
-							.padding(vertical = 12.dp)
-							.clickable {
-								viewModel.updateAlumniStatusState(AccountStatus.INACTIVE)
-							},
-						horizontalAlignment = Alignment.CenterHorizontally,
-					) {
-						Text(
-							text = "Inactive",
-							color = Color.DarkGray,
-							fontWeight = FontWeight.Bold
-						)
-					}
-				}
-
-				Spacer(Modifier.height(16.dp))
-				HorizontalDivider()
-				Spacer(Modifier.height(16.dp))
-
-				Text(
-					text = "Account Role",
-					style = MaterialTheme.typography.titleLarge,
-					fontWeight = FontWeight.Bold
-				)
-				Spacer(Modifier.height(12.dp))
-				Row(
-					modifier = Modifier.fillMaxWidth()
-				) {
-					if (alumni.role == Role.ALUMNI) {
-						Column(
-							Modifier
-								.weight(1f)
-								.background(Color.LightGray, RoundedCornerShape(8.dp))
-								.fillMaxHeight()
-								.padding(vertical = 12.dp)
-								.clickable { pendingRole = Role.ADMIN },
-							horizontalAlignment = Alignment.CenterHorizontally,
-						) {
-						Text(
-							text = "Promote to Admin",
-							color = Color.DarkGray,
-							fontWeight = FontWeight.Bold
-						)
-					}
-					} else {
-						Column(
-							Modifier
-								.weight(1f)
-								.background(Color.Red, RoundedCornerShape(8.dp))
-								.fillMaxHeight()
-								.padding(vertical = 12.dp)
-								.clickable {
-									pendingRole = Role.ALUMNI
-								},
-						horizontalAlignment = Alignment.CenterHorizontally,
-					) {
-						Text(
-							text = "Demote to Alumni",
-							color = Color.White,
-							fontWeight = FontWeight.Bold
-						)
-					}
-				}
-			}
             Text(
                 text = "Account Status",
                 style = MaterialTheme.typography.titleLarge,
@@ -597,7 +477,52 @@ fun AdminEditAlumniProfileScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Extended Information",
+                text = "Account Role",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+            )
+            Text(
+                text = "Manage user role permissions",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (alumni.role == Role.ALUMNI) {
+                    Button(
+                        onClick = { pendingRole = Role.ADMIN },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Promote to Admin")
+                    }
+                } else {
+                    Button(
+                        onClick = { pendingRole = Role.ALUMNI },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Demote to Alumni")
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "Management",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -779,4 +704,18 @@ fun AdminEditAlumniProfileScreen(
             }
         )
     }
+}
+
+private fun openUrl(context: Context, rawUrl: String) {
+    if (rawUrl.isBlank()) return
+    val url = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    context.startActivity(intent)
+}
+
+private fun dialPhone(context: Context, phone: String) {
+    if (phone.isBlank()) return
+    val cleaned = phone.replace(" ", "")
+    val intent = Intent(Intent.ACTION_DIAL, "tel:$cleaned".toUri())
+    context.startActivity(intent)
 }

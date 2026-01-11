@@ -62,7 +62,6 @@ import com.team.ian.ui.screens.admin.registrations.AdminViewAllRegistrationsScre
 import com.team.ian.ui.screens.admin.registrations.AdminViewRegistrationScreen
 import com.team.ian.ui.screens.profile.AddOrEditContactLinksScreen
 import com.team.ian.ui.screens.profile.AddOrEditExtendedInfoScreen
-import com.team.ian.ui.screens.profile.ExtendedInfoScreen
 import com.team.ian.ui.screens.viewProfile.ViewProfileScreen
 import kotlinx.coroutines.launch
 
@@ -254,10 +253,6 @@ fun AppNav() {
 							AddOrEditExtendedInfoScreen(navController)
 						}
 
-						composable<Screen.ExtendedInfo> {
-							ExtendedInfoScreen(navController)
-						}
-
                         composable<Screen.AddOrEditContactLinks> {
                             AddOrEditContactLinksScreen(navController)
                         }
@@ -341,10 +336,6 @@ fun AppNav() {
 
 				composable<Screen.AddOrEditExtendedInfo> {
 					AddOrEditExtendedInfoScreen(navController)
-				}
-
-				composable<Screen.ExtendedInfo> {
-					ExtendedInfoScreen(navController)
 				}
 
                 composable<Screen.AddOrEditContactLinks> {

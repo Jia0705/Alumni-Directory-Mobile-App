@@ -64,8 +64,6 @@ import com.team.ian.ui.navigation.Screen
 import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.components.InfoRow
-import com.team.ian.ui.components.JobHistoryChips
-import com.team.ian.ui.components.SkillsChipRow
 
 @Composable
 fun ProfileScreen(
@@ -308,35 +306,35 @@ fun ProfileScreen(
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
-                    OutlinedButton(
-                        onClick = { signOut() },
+                    Button(
+                        onClick = { navController.navigate(Screen.Settings) },
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(
-                            Icons.Filled.Logout,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
                         Text(
-                            text = "Sign Out",
+                            text = "Privacy Controls",
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
 
-                Button(
-                    onClick = { navController.navigate(Screen.Settings) },
+                OutlinedButton(
+                    onClick = { signOut() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
+                    Icon(
+                        Icons.Filled.Logout,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "Privacy Controls",
+                        text = "Sign Out",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }

@@ -42,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -192,12 +193,18 @@ fun HomeScreen(
 										}
 										Spacer(modifier = Modifier.height(16.dp))
 										Text(
-											text = if (it.showEmail) {
-												"${it.fullName}, ${it.email}"
-											} else {
-												it.fullName
-											}
+											text = it.fullName,
+											style = MaterialTheme.typography.titleMedium,
+											fontWeight = FontWeight.Bold,
+											color = MaterialTheme.colorScheme.onSurface
 										)
+										if (it.showEmail) {
+											Text(
+												text = it.email,
+												style = MaterialTheme.typography.bodySmall,
+												color = MaterialTheme.colorScheme.onSurfaceVariant
+											)
+										}
 									}
 								}
 							}

@@ -1,8 +1,8 @@
 package com.team.ian.ui.screens.profile
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Work
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,12 +27,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -40,9 +41,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.ContactLinks
@@ -55,7 +54,20 @@ fun AddOrEditContactLinksScreen(navController: NavController) {
     var linkedIn by remember { mutableStateOf("") }
     var github by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
+    var showDiscardDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    BackHandler {
+        val hasChanges = linkedIn != (contactLinks?.linkedIn ?: "") ||
+                github != (contactLinks?.github ?: "") ||
+                phoneNumber != (contactLinks?.phoneNumber ?: "")
+        
+        if (hasChanges) {
+            showDiscardDialog = true
+        } else {
+            navController.popBackStack()
+        }
+    }
 
     LaunchedEffect(contactLinks) {
         contactLinks?.let { links ->
@@ -103,7 +115,6 @@ fun AddOrEditContactLinksScreen(navController: NavController) {
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
@@ -170,7 +181,28 @@ fun AddOrEditContactLinksScreen(navController: NavController) {
             }
         }
     }
-}
+    if (showDiscardDialog) {
+        AlertDialog(
+            onDismissRequest = { showDiscardDialog = false },
+            title = { Text("Discard changes?") },
+            text = { Text("You have unsaved changes.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDiscardDialog = false
+                        navController.popBackStack()
+                    }
+                ) {
+                    Text("Discard")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscardDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }}
 
 @Composable
 private fun ContactInputField(
