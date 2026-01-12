@@ -613,7 +613,7 @@ fun AdminEditAlumniProfileScreen(
 		)
 	}
 
-	if (pendingRole != null) {
+    if (pendingRole != null) {
 		val nextRole = pendingRole ?: Role.ALUMNI
 		AlertDialog(
 			onDismissRequest = { pendingRole = null },

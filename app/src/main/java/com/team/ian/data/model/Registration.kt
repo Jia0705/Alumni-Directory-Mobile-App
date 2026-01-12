@@ -18,4 +18,3 @@ data class Registration(
 	val workExperience: String = "",
 	val photoURL: String = ""
 )
-
