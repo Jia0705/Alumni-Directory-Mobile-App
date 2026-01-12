@@ -1,6 +1,5 @@
 package com.team.ian.data.repo
 
-import android.net.Uri
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.ContactLinks
 import com.team.ian.data.model.ExtendedInfo
@@ -21,20 +20,6 @@ interface AlumniRepo {
 	suspend fun deactivateAlumni(uid: String)
 	suspend fun addExtendedInfo(extendedInfo: ExtendedInfo)
 	suspend fun getExtendedInfo(uid: String): ExtendedInfo?
-
     suspend fun addContactLinks(contactLinks: ContactLinks)
     suspend fun getContactLinks(uid:String): ContactLinks?
-
-    // TODO: remove or update
-	suspend fun uploadProfilePhoto(uid: String, imageUri: Uri)
-
-	companion object {
-		private var instance: AlumniRepo? = null
-		fun getInstance(): AlumniRepo {
-			if (instance == null) {
-				instance = AlumniRepoRealImpl()
-			}
-			return instance!!
-		}
-	}
 }

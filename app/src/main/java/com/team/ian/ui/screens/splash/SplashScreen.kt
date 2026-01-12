@@ -18,69 +18,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.team.ian.data.model.AccountStatus
-import com.team.ian.data.model.Role
-import com.team.ian.data.repo.AlumniRepo
-import com.team.ian.service.AuthService
 import com.team.ian.ui.navigation.Screen
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-	navController: NavController,
-	authService: AuthService = AuthService.getInstance(),
-	alumniRepo: AlumniRepo = AlumniRepo.getInstance()
+	navController: NavController
 ) {
+	val viewModel: SplashViewModel = hiltViewModel()
+
 	LaunchedEffect(Unit) {
 		delay(1200)
-
-		val user = authService.getCurrentUser()
-
-		// Not login
-		if (user == null) {
-			navigate(navController, Screen.Login)
-			return@LaunchedEffect
-		}
-
-		// Login and check alumni profile
-		val alumni = alumniRepo.getAlumniByUid(user.id)
-
-		if (alumni != null) {
-			// Update user role in AuthService
-			authService.updateUserRole(alumni.role)
-		}
-
-		when {
-			alumni == null -> {
-				// Login but never registered
-				navigate(navController, Screen.Register)
-			}
-
-			alumni.role == Role.ADMIN -> {
-				navigate(navController, Screen.Home) // change it back to admin dashboard when u re done
-			}
-
-			alumni.status == AccountStatus.PENDING -> {
-				navigate(navController, Screen.Pending)
-			}
-
-			alumni.status == AccountStatus.REJECTED -> {
-				navigate(navController, Screen.Rejected)
-			}
-
-			alumni.status == AccountStatus.INACTIVE -> {
-				navigate(navController, Screen.Inactive)
-			}
-
-			alumni.status == AccountStatus.APPROVED -> {
-				navigate(navController, Screen.Home)
-			}
-
-			else -> {
-				navigate(navController, Screen.Login)
-			}
-		}
+		val destination = viewModel.determineStartDestination()
+		navigate(navController, destination)
 	}
 
 	Box(

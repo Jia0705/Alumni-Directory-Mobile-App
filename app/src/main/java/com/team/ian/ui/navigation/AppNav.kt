@@ -35,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,9 +53,7 @@ import com.team.ian.ui.screens.status.RejectedScreen
 import com.team.ian.ui.screens.status.InactiveScreen
 import com.team.ian.ui.screens.utils.FullScreenLoader
 import com.team.ian.ui.screens.utils.SnackbarController
-import com.team.ian.service.AuthService
 import com.team.ian.data.model.Role
-import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.ui.screens.admin.manage_alumni.AdminEditAlumniProfileScreen
 import com.team.ian.ui.screens.admin.manage_alumni.AdminManageAlumniScreen
 import com.team.ian.ui.screens.admin.dashboard.AdminDashboardScreen
@@ -71,12 +70,9 @@ fun AppNav() {
 	val navController = rememberNavController()
 	val drawerState = rememberDrawerState(DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
-	val authService = AuthService.getInstance()
-	val alumniRepo = AlumniRepo.getInstance()
-	val currentUser = authService.user.collectAsStateWithLifecycle().value
-	val pendingAlumni = alumniRepo.getPendingAlumni().collectAsStateWithLifecycle(
-		initialValue = emptyList()
-	).value
+	val viewModel: AppNavViewModel = hiltViewModel()
+	val currentUser = viewModel.user.collectAsStateWithLifecycle().value
+	val pendingAlumni = viewModel.pendingAlumni.collectAsStateWithLifecycle(initialValue = emptyList()).value
 	val pendingCount = pendingAlumni.size
 
 	val allDrawerItems = listOf(

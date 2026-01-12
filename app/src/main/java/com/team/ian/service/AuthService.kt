@@ -16,8 +16,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthService private constructor() {
+@Singleton
+class AuthService @Inject constructor() {
 	private val firebaseAuth = FirebaseAuth.getInstance()
 	private val _user = MutableStateFlow<User?>(null)
 	val user = _user.asStateFlow()
@@ -38,20 +41,12 @@ class AuthService private constructor() {
 	}
 
 	// Google Login
-	suspend fun signInWithGoogle(context: Context) {
-		try {
-			val token = getGoogleCredentialToken(context) ?: return
-			val credential = GoogleAuthProvider.getCredential(token, null)
-			val result = firebaseAuth.signInWithCredential(credential).await()
-			result.user?.let { updateUser(it) }
-
-		} catch (e: GetCredentialCancellationException) {
-			Log.d("AuthService", "Sign in cancelled", e)
-		} catch (e: GetCredentialException) {
-			Log.d("AuthService", "Google sign in failed", e)
-		} catch (e: Exception) {
-			Log.d("AuthService", "Sign in failed", e)
-		}
+	suspend fun signInWithGoogle(context: Context): Boolean {
+		val token = getGoogleCredentialToken(context) ?: return false
+		val credential = GoogleAuthProvider.getCredential(token, null)
+		val result = firebaseAuth.signInWithCredential(credential).await()
+		result.user?.let { updateUser(it) }
+		return result.user != null
 	}
 
 	// Email Authentication
@@ -98,23 +93,20 @@ class AuthService private constructor() {
 			result.credential.data.getString(
 				"com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN"
 			)
-		} catch (e: Exception) {
-			Log.d("AuthService", "Token failed", e)
-			null
-		}
+	} catch (e: GetCredentialCancellationException) {
+		Log.d("AuthService", "Sign in cancelled", e)
+		null
+	} catch (e: GetCredentialException) {
+		Log.d("AuthService", "Google sign in failed", e)
+		null
+	} catch (e: Exception) {
+		Log.d("AuthService", "Token failed", e)
+		null
+	}
 	}
 
 	companion object {
 		private const val GOOGLE_CLIENT_ID =
 			"757886253550-bcafc6as2kbpfvcjcsn4m724uq043l60.apps.googleusercontent.com"
-
-		private var instance: AuthService? = null
-
-		fun getInstance(): AuthService {
-			if (instance == null) {
-				instance = AuthService()
-			}
-			return instance!!
-		}
 	}
 }

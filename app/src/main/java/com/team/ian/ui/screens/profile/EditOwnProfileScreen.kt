@@ -26,15 +26,11 @@ import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,12 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.BackHandler
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
+import com.team.ian.ui.components.DiscardChangesDialog
 import com.team.ian.ui.components.InfoTextField
+import com.team.ian.ui.components.ManageInfoCard
 import com.team.ian.ui.navigation.Screen
 import com.team.ian.ui.screens.utils.setRefresh
 
@@ -58,7 +56,7 @@ import com.team.ian.ui.screens.utils.setRefresh
 fun EditOwnProfileScreen(
     navController: NavController
 ) {
-    val viewModel: EditOwnProfileViewModel = viewModel()
+    val viewModel: EditOwnProfileViewModel = hiltViewModel()
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
     val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
     var initialAlumni by remember { mutableStateOf(Alumni()) }
@@ -256,53 +254,25 @@ fun EditOwnProfileScreen(
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
             )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                TextButton(
-                    onClick = {
-                        navController.navigate(
-                            Screen.AddOrEditContactLinks(alumni.uid)
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Link,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+            ManageInfoCard(
+                label = "Manage Contact Links",
+                icon = Icons.Outlined.Link,
+                onClick = {
+                    navController.navigate(
+                        Screen.AddOrEditContactLinks(alumni.uid)
                     )
-                    Text("Manage Contact Links")
                 }
-            }
+            )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                TextButton(
-                    onClick = {
-                        navController.navigate(
-                            Screen.AddOrEditExtendedInfo(alumni.uid)
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+            ManageInfoCard(
+                label = "Manage Extended Info",
+                icon = Icons.Outlined.Info,
+                onClick = {
+                    navController.navigate(
+                        Screen.AddOrEditExtendedInfo(alumni.uid)
                     )
-                    Text("Manage Extended Info")
                 }
-            }
+            )
 
             Spacer(Modifier.height(16.dp))
 
@@ -357,25 +327,12 @@ fun EditOwnProfileScreen(
     }
 
     if (showDiscardDialog) {
-        AlertDialog(
-            onDismissRequest = { showDiscardDialog = false },
-            title = { Text("Discard changes?") },
-            text = { Text("You have unsaved changes.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDiscardDialog = false
-                        navController.popBackStack()
-                    }
-                ) {
-                    Text("Discard")
-                }
+        DiscardChangesDialog(
+            onDiscard = {
+                showDiscardDialog = false
+                navController.popBackStack()
             },
-            dismissButton = {
-                TextButton(onClick = { showDiscardDialog = false }) {
-                    Text("Keep Editing")
-                }
-            }
+            onDismiss = { showDiscardDialog = false }
         )
     }
 }

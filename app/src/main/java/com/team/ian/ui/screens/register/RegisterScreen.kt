@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.Registration
 import com.team.ian.ui.navigation.Screen
@@ -42,7 +42,7 @@ import com.team.ian.ui.navigation.Screen
 fun RegisterScreen(
 	navController: NavController
 ) {
-	val viewModel: RegisterViewModel = viewModel()
+	val viewModel: RegisterViewModel = hiltViewModel()
 	val context = LocalContext.current
 
 	var page by remember { mutableIntStateOf(0) }

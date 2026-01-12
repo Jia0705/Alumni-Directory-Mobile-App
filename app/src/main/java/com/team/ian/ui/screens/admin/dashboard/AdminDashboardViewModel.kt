@@ -6,9 +6,11 @@ import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.Role
 import com.team.ian.data.repo.AlumniRepo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class AdminDashboardState(
 	val approvedCount: Int = 0,
@@ -19,8 +21,9 @@ data class AdminDashboardState(
 	val recentApprovals: List<Alumni> = emptyList()
 )
 
-class AdminDashboardViewModel(
-	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance()
+@HiltViewModel
+class AdminDashboardViewModel @Inject constructor(
+	private val alumniRepo: AlumniRepo
 ) : ViewModel() {
 	private val _state = MutableStateFlow(AdminDashboardState())
 	val state = _state.asStateFlow()

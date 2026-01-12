@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.data.repo.AlumniRepo
-import com.team.ian.service.AuthService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,8 +33,19 @@ class AddOrEditExtendedInfoViewModel @Inject constructor(
     fun getExtendedInfo() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                alumniRepo.getExtendedInfo(alumniId)?.let { extendedInfo ->
-                    _extendedInfo.value = extendedInfo
+                val info = alumniRepo.getExtendedInfo(alumniId)
+                if (info != null) {
+                    _extendedInfo.value = info
+                } else {
+                    val alumni = alumniRepo.getAlumniByUid(alumniId)
+                    if (alumni != null) {
+                        _extendedInfo.value = ExtendedInfo(
+                            uid = alumniId,
+                            pastJobHistory = alumni.pastJobHistory,
+                            skills = alumni.skills,
+                            shortBio = alumni.shortBio
+                        )
+                    }
                 }
 
             } catch (e: Exception) {

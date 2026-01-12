@@ -9,9 +9,13 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltAndroidApp
 class MyApp: Application() {
+	@Inject lateinit var authService: AuthService
+	@Inject lateinit var alumniRepo: AlumniRepo
+
 	override fun onCreate() {
 		super.onCreate()
 
@@ -27,10 +31,10 @@ class MyApp: Application() {
 			// Save token to Realtime Database for this user
 			CoroutineScope(Dispatchers.IO).launch {
 				try {
-					val currentUser = AuthService.getInstance().getCurrentUser()
+					val currentUser = authService.getCurrentUser()
 					if (currentUser != null) {
 						val updates = mapOf("token" to token)
-						AlumniRepo.getInstance().updateProfile(currentUser.id, updates)
+						alumniRepo.updateProfile(currentUser.id, updates)
 						Log.d("token", "Token saved to database")
 					}
 				} catch (e: Exception) {

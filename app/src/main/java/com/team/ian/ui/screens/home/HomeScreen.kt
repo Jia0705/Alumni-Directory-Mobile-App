@@ -44,8 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.navigation.Screen
@@ -54,7 +54,7 @@ import com.team.ian.ui.navigation.Screen
 fun HomeScreen(
 	navController: NavController
 ) {
-	val viewModel: HomeViewModel = viewModel()
+	val viewModel: HomeViewModel = hiltViewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
 	val search = viewModel.search.collectAsStateWithLifecycle().value
 	val selectedStack = viewModel.selectedStack.collectAsStateWithLifecycle().value

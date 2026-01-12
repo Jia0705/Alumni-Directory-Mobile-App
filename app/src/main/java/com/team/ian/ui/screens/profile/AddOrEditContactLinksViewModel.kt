@@ -53,8 +53,19 @@ class AddOrEditContactLinksViewModel @Inject constructor(
     fun getContactLinks() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                alumniRepo.getContactLinks(alumniId)?.let { contactLinks ->
-                    _contactLinks.value = contactLinks
+                val links = alumniRepo.getContactLinks(alumniId)
+                if (links != null) {
+                    _contactLinks.value = links
+                } else {
+                    val alumni = alumniRepo.getAlumniByUid(alumniId)
+                    if (alumni != null) {
+                        _contactLinks.value = ContactLinks(
+                            uid = alumniId,
+                            linkedIn = alumni.linkedin,
+                            github = alumni.github,
+                            phoneNumber = alumni.phone
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 Log.d("debugging", e.toString())

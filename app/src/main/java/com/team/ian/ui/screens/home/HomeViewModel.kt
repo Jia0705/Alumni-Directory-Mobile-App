@@ -3,20 +3,24 @@ package com.team.ian.ui.screens.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.ian.core.utils.AlumniFilter
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.Role
 import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.service.AuthService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel (
-	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance(),
-	private val authService: AuthService = AuthService.getInstance()
-): ViewModel(){
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+	private val alumniRepo: AlumniRepo,
+	private val authService: AuthService
+): ViewModel() {
 	private val _allAlumni = MutableStateFlow(emptyList<Alumni>())
 	private val _search = MutableStateFlow("")
 	val search = _search.asStateFlow()
@@ -113,36 +117,13 @@ class HomeViewModel (
 				_selectedCountry,
 				_selectedYear
 			) { allAlumni, query, stack, country, year ->
-				var filtered = allAlumni
-
-				// Search
-				if (query.isNotBlank()) {
-					filtered = filtered.filter { alumni ->
-						alumni.fullName.contains(query, ignoreCase = true) ||
-						alumni.email.contains(query, ignoreCase = true) ||
-						alumni.primaryStack.contains(query, ignoreCase = true) ||
-						alumni.company.contains(query, ignoreCase = true) ||
-						alumni.city.contains(query, ignoreCase = true) ||
-						alumni.country.contains(query, ignoreCase = true)
-					}
-				}
-
-				// Filter
-				if (stack != null) {
-					filtered = filtered.filter { it.primaryStack.equals(stack, ignoreCase = true) }
-				}
-
-				// Country filter
-				if (country != null) {
-					filtered = filtered.filter { it.country.equals(country, ignoreCase = true) }
-				}
-
-				// Year filter
-				if (year != null) {
-					filtered = filtered.filter { it.graduationYear == year }
-				}
-
-				filtered
+				AlumniFilter.filterAlumni(
+					alumniList = allAlumni,
+					query = query,
+					stack = stack,
+					country = country,
+					year = year
+				)
 			}.collect { filteredList ->
 				_alumni.value = filteredList
 			}

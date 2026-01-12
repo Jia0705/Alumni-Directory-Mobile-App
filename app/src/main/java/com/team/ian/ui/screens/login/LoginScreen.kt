@@ -34,14 +34,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.ui.navigation.Screen
 
 @Composable
 fun LoginScreen(
 	navController: NavController,
-	viewModel: LoginViewModel = viewModel()
+	viewModel: LoginViewModel = hiltViewModel()
 ) {
 	val context = LocalContext.current
 

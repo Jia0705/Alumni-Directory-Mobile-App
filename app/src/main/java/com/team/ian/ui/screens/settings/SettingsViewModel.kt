@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.service.AuthService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel(
-	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance(),
-	private val authService: AuthService = AuthService.getInstance()
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+	private val alumniRepo: AlumniRepo,
+	private val authService: AuthService
 ) : ViewModel() {
 	private val _alumni = MutableStateFlow(Alumni())
 	val alumni = _alumni.asStateFlow()
