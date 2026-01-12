@@ -1,0 +1,15 @@
+{
+  "name": "notification-server",
+  "version": "1.0.0",
+  "description": "Express server for sending FCM notifications",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "firebase-admin": "^12.0.0",
+    "body-parser": "^1.20.2"
+  }
+}
