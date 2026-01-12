@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import android.content.Context
-import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Code
@@ -37,16 +35,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.core.net.toUri
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.team.ian.ui.components.Avatar
+import com.team.ian.ui.components.ExtendedInfoSection
 import com.team.ian.ui.components.InfoRow
-import com.team.ian.ui.components.JobHistoryChips
 import com.team.ian.ui.components.ProfileSection
-import com.team.ian.ui.components.SkillsChipRow
+import com.team.ian.ui.screens.utils.dialPhone
+import com.team.ian.ui.screens.utils.openEmail
+import com.team.ian.ui.screens.utils.openUrl
 
 @Composable
 fun AdminViewRegistrationScreen(
@@ -136,62 +135,12 @@ fun AdminViewRegistrationScreen(
 		if (alumni.shortBio.isNotBlank() || alumni.skills.isNotEmpty() || alumni.pastJobHistory.isNotEmpty()) {
 			ProfileSection(title = "Extended Information", icon = Icons.Filled.Person) {
 				Column(modifier = Modifier.fillMaxWidth()) {
-					if (alumni.shortBio.isNotBlank()) {
-						Text(
-							text = "Short Bio",
-							style = MaterialTheme.typography.labelLarge,
-							fontWeight = FontWeight.SemiBold,
-							color = MaterialTheme.colorScheme.onSurfaceVariant
-						)
-						Spacer(modifier = Modifier.height(4.dp))
-						Text(
-							text = alumni.shortBio,
-							style = MaterialTheme.typography.bodyMedium,
-							color = MaterialTheme.colorScheme.onSurface
-						)
-						Spacer(modifier = Modifier.height(16.dp))
-					}
-
-					if (alumni.skills.isNotEmpty()) {
-						Text(
-							text = "Skills",
-							style = MaterialTheme.typography.labelLarge,
-							fontWeight = FontWeight.SemiBold,
-							color = MaterialTheme.colorScheme.onSurfaceVariant
-						)
-						Spacer(modifier = Modifier.height(8.dp))
-						val skills = alumni.skills.filter { it.isNotBlank() }
-						if (skills.isEmpty()) {
-							Text(
-								text = "No skills added yet",
-								style = MaterialTheme.typography.bodyMedium,
-								color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-							)
-						} else {
-							SkillsChipRow(skills = skills)
-						}
-						Spacer(modifier = Modifier.height(16.dp))
-					}
-
-					if (alumni.pastJobHistory.isNotEmpty()) {
-						Text(
-							text = "Work Experience",
-							style = MaterialTheme.typography.labelLarge,
-							fontWeight = FontWeight.SemiBold,
-							color = MaterialTheme.colorScheme.onSurfaceVariant
-						)
-						Spacer(modifier = Modifier.height(8.dp))
-						val jobs = alumni.pastJobHistory.filter { it.isNotBlank() }
-						if (jobs.isEmpty()) {
-							Text(
-								text = "No work experience added yet",
-								style = MaterialTheme.typography.bodyMedium,
-								color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-							)
-						} else {
-							JobHistoryChips(jobs = jobs)
-						}
-					}
+					ExtendedInfoSection(
+						shortBio = alumni.shortBio,
+						skills = alumni.skills,
+						pastJobHistory = alumni.pastJobHistory,
+						showEmptyText = true
+					)
 				}
 			}
 		}
@@ -240,26 +189,4 @@ fun AdminViewRegistrationScreen(
 
 		Spacer(Modifier.height(16.dp))
 	}
-}
-
-private fun openEmail(context: Context, email: String) {
-	if (email.isBlank()) return
-	val intent = Intent(Intent.ACTION_SENDTO).apply {
-		data = "mailto:$email".toUri()
-	}
-	context.startActivity(intent)
-}
-
-private fun openUrl(context: Context, rawUrl: String) {
-	if (rawUrl.isBlank()) return
-	val url = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
-	val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-	context.startActivity(intent)
-}
-
-private fun dialPhone(context: Context, phone: String) {
-	if (phone.isBlank()) return
-	val cleaned = phone.replace(" ", "")
-	val intent = Intent(Intent.ACTION_DIAL, "tel:$cleaned".toUri())
-	context.startActivity(intent)
 }

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Work
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.ContactLinks
+import com.team.ian.ui.components.DiscardChangesDialog
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
@@ -182,25 +181,13 @@ fun AddOrEditContactLinksScreen(navController: NavController) {
         }
     }
     if (showDiscardDialog) {
-        AlertDialog(
-            onDismissRequest = { showDiscardDialog = false },
-            title = { Text("Discard changes?") },
-            text = { Text("You have unsaved changes.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDiscardDialog = false
-                        navController.popBackStack()
-                    }
-                ) {
-                    Text("Discard")
-                }
+        DiscardChangesDialog(
+            onDiscard = {
+                showDiscardDialog = false
+                navController.popBackStack()
             },
-            dismissButton = {
-                TextButton(onClick = { showDiscardDialog = false }) {
-                    Text("Cancel")
-                }
-            }
+            onDismiss = { showDiscardDialog = false },
+            dismissLabel = "Cancel"
         )
     }}
 

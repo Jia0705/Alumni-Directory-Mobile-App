@@ -1,6 +1,5 @@
 package com.team.ian.core.di
 
-import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.data.api.NotificationService
 import dagger.Module
 import dagger.Provides
@@ -16,12 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
-	@Provides
-	@Singleton
-	fun provideAlumniRepo(): AlumniRepo{
-		return AlumniRepo.getInstance()
-	}
-
 	// Retrofit & Notification Service
 	@Provides
 	@Singleton

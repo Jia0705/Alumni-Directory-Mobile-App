@@ -47,7 +47,7 @@ class AdminViewRegistrationViewModel @Inject constructor(
 				alumniRepo.approveAlumni(pendingAlumniId)
 				Log.d("debugging", "Alumni approved in database")
 				
-				val userToken = _pendingAlumni.value.token
+				val userToken = getPendingToken()
 				if (userToken.isNotBlank()) {
 					try {
 						val response = notificationService.sendApprovalNotification(
@@ -76,7 +76,7 @@ class AdminViewRegistrationViewModel @Inject constructor(
 				alumniRepo.rejectAlumni(pendingAlumniId)
 				Log.d("debugging", "Alumni rejected in database")
 				
-				val userToken = _pendingAlumni.value.token
+				val userToken = getPendingToken()
 				if (userToken.isNotBlank()) {
 					try {
 						val response = notificationService.sendRejectionNotification(
@@ -97,5 +97,11 @@ class AdminViewRegistrationViewModel @Inject constructor(
 				Log.e("debugging", "Error rejecting alumni: ${e.message}")
 			}
 		}
+	}
+
+	private suspend fun getPendingToken(): String {
+		val cached = _pendingAlumni.value.token
+		if (cached.isNotBlank()) return cached
+		return alumniRepo.getAlumniByUid(pendingAlumniId)?.token.orEmpty()
 	}
 }

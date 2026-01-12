@@ -3,10 +3,13 @@ package com.team.ian.ui.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.ian.service.AuthService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel(
-	private val authService: AuthService = AuthService.getInstance()
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+	private val authService: AuthService
 ) : ViewModel() {
 
 	fun loginWithEmail(
@@ -32,8 +35,12 @@ class LoginViewModel(
 	) {
 		viewModelScope.launch {
 			try {
-				authService.signInWithGoogle(context)
-				onSuccess()
+				val signedIn = authService.signInWithGoogle(context)
+				if (signedIn) {
+					onSuccess()
+				} else {
+					onError("Google sign-in was cancelled")
+				}
 			} catch (e: Exception) {
 				onError(e.message ?: "Google sign-in failed")
 			}

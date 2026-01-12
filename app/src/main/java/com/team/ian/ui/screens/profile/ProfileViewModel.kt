@@ -8,14 +8,17 @@ import com.team.ian.data.model.ContactLinks
 import com.team.ian.data.model.ExtendedInfo
 import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.service.AuthService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel(
-	private val alumniRepo: AlumniRepo = AlumniRepo.getInstance(),
-    private val authService: AuthService = AuthService.getInstance()
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+	private val alumniRepo: AlumniRepo,
+    private val authService: AuthService
 ) : ViewModel() {
 	private val _alumni = MutableStateFlow(Alumni())
 	val alumni = _alumni.asStateFlow()
@@ -23,7 +26,8 @@ class ProfileViewModel(
     val extendedInfo = _extendedInfo.asStateFlow()
     private val _contactLinks = MutableStateFlow(ContactLinks())
     val contactLinks = _contactLinks.asStateFlow()
-    val userId = authService.getCurrentUser()?.id
+    val user = authService.user
+    private val userId = authService.getCurrentUser()?.id
 
     init {
         loadAlumniProfile()
@@ -50,9 +54,13 @@ class ProfileViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 userId?.let {
-                    alumniRepo.getExtendedInfo(userId)?.let {
-                        _extendedInfo.value = it
-                    }
+                    val info = alumniRepo.getExtendedInfo(userId)
+                    _extendedInfo.value = info ?: ExtendedInfo(
+                        uid = userId,
+                        pastJobHistory = _alumni.value.pastJobHistory,
+                        skills = _alumni.value.skills,
+                        shortBio = _alumni.value.shortBio
+                    )
                 }
             }catch (e: Exception){
                 Log.d("debugging",e.toString())
@@ -64,9 +72,13 @@ class ProfileViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 userId?.let {
-                    alumniRepo.getContactLinks(userId)?.let {
-                        _contactLinks.value = it
-                    }
+                    val links = alumniRepo.getContactLinks(userId)
+                    _contactLinks.value = links ?: ContactLinks(
+                        uid = userId,
+                        linkedIn = _alumni.value.linkedin,
+                        github = _alumni.value.github,
+                        phoneNumber = _alumni.value.phone
+                    )
                 }
             }catch (e: Exception){
                 Log.d("debugging",e.toString())
@@ -85,5 +97,9 @@ class ProfileViewModel(
                 Log.d("debugging", e.toString())
             }
         }
+    }
+
+    fun signOut() {
+        authService.signOut()
     }
 }

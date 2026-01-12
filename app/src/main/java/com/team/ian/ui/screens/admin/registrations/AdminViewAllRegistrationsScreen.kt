@@ -26,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.ui.components.Avatar
 import com.team.ian.ui.navigation.Screen
@@ -36,7 +36,7 @@ import com.team.ian.ui.navigation.Screen
 fun AdminViewAllRegistrationsScreen(
 	navController: NavController
 ) {
-	val viewModel: AdminViewAllRegistrationsViewModel = viewModel()
+	val viewModel: AdminViewAllRegistrationsViewModel = hiltViewModel()
 	val pendingAlumni = viewModel.pendingAlumni.collectAsStateWithLifecycle().value
 	Box(
 		modifier = Modifier.fillMaxSize(),

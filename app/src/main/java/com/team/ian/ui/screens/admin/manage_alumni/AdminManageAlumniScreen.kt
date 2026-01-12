@@ -46,8 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.ui.components.Avatar
@@ -57,7 +57,7 @@ import com.team.ian.ui.navigation.Screen
 fun AdminManageAlumniScreen(
 	navController: NavController
 ) {
-	val viewModel: AdminManageAlumniViewModel = viewModel()
+	val viewModel: AdminManageAlumniViewModel = hiltViewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
 	val search = viewModel.search.collectAsStateWithLifecycle().value
 	val selectedStatus = viewModel.selectedStatus.collectAsStateWithLifecycle().value

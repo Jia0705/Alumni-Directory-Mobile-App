@@ -1,7 +1,5 @@
 package com.team.ian.ui.screens.admin.manage_alumni
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.Phone
@@ -56,7 +53,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.team.ian.ui.components.DiscardChangesDialog
 import com.team.ian.ui.components.InfoTextField
+import com.team.ian.ui.components.ManageInfoCard
 import com.team.ian.data.model.AccountStatus
 import com.team.ian.data.model.Alumni
 import com.team.ian.data.model.AlumniField
@@ -65,6 +64,8 @@ import com.team.ian.ui.components.JobHistoryChips
 import com.team.ian.ui.components.SkillsChipRow
 import com.team.ian.ui.navigation.Screen
 import com.team.ian.data.model.Role
+import com.team.ian.ui.screens.utils.dialPhone
+import com.team.ian.ui.screens.utils.openUrl
 import com.team.ian.ui.screens.utils.setRefresh
 
 @Composable
@@ -73,8 +74,6 @@ fun AdminEditAlumniProfileScreen(
 ) {
     val viewModel: AdminEditAlumniProfileViewModel = hiltViewModel()
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
-    val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
-    val contactLinks = viewModel.contactLinks.collectAsStateWithLifecycle().value
     val context = LocalContext.current
     var initialAlumni by remember { mutableStateOf(Alumni()) }
     var initialSet by remember { mutableStateOf(false) }
@@ -271,7 +270,7 @@ fun AdminEditAlumniProfileScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            if (contactLinks.linkedIn.isNotBlank() || contactLinks.github.isNotBlank() || contactLinks.phoneNumber.isNotBlank()) {
+            if (alumni.linkedin.isNotBlank() || alumni.github.isNotBlank() || alumni.phone.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(2.dp),
@@ -281,14 +280,14 @@ fun AdminEditAlumniProfileScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        if (contactLinks.linkedIn.isNotBlank()) {
-                            InfoRow("LinkedIn", contactLinks.linkedIn, Icons.Outlined.Link)
+                        if (alumni.linkedin.isNotBlank()) {
+                            InfoRow("LinkedIn", alumni.linkedin, Icons.Outlined.Link, onClick = { openUrl(context, alumni.linkedin) })
                         }
-                        if (contactLinks.github.isNotBlank()) {
-                            InfoRow("GitHub", contactLinks.github, Icons.Outlined.Link)
+                        if (alumni.github.isNotBlank()) {
+                            InfoRow("GitHub", alumni.github, Icons.Outlined.Link, onClick = { openUrl(context, alumni.github) })
                         }
-                        if (contactLinks.phoneNumber.isNotBlank()) {
-                            InfoRow("Phone", contactLinks.phoneNumber, Icons.Filled.Phone)
+                        if (alumni.phone.isNotBlank()) {
+                            InfoRow("Phone", alumni.phone, Icons.Filled.Phone, onClick = { dialPhone(context, alumni.phone) })
                         }
                     }
                 }
@@ -320,7 +319,7 @@ fun AdminEditAlumniProfileScreen(
             )
 
             // About Section
-            if (extendedInfo.shortBio.isNotBlank()) {
+            if (alumni.shortBio.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(2.dp),
@@ -334,7 +333,7 @@ fun AdminEditAlumniProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            extendedInfo.shortBio,
+                            alumni.shortBio,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -342,7 +341,7 @@ fun AdminEditAlumniProfileScreen(
             }
 
             // Skills Section
-            if (extendedInfo.skills.isNotEmpty()) {
+            if (alumni.skills.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(2.dp),
@@ -355,7 +354,7 @@ fun AdminEditAlumniProfileScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        val skills = extendedInfo.skills.filter { it.isNotBlank() }
+                        val skills = alumni.skills.filter { it.isNotBlank() }
                         if (skills.isEmpty()) {
                             Text(
                                 text = "No skills added yet",
@@ -370,7 +369,7 @@ fun AdminEditAlumniProfileScreen(
             }
 
             // Work Experience Section
-            if (extendedInfo.pastJobHistory.isNotEmpty()) {
+            if (alumni.pastJobHistory.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(2.dp),
@@ -383,7 +382,7 @@ fun AdminEditAlumniProfileScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        val jobs = extendedInfo.pastJobHistory.filter { it.isNotBlank() }
+                        val jobs = alumni.pastJobHistory.filter { it.isNotBlank() }
                         if (jobs.isEmpty()) {
                             Text(
                                 text = "No work experience added yet",
@@ -522,60 +521,32 @@ fun AdminEditAlumniProfileScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Management",
+                text = "Extended Information",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
             )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                TextButton(
-                    onClick = {
-                        navController.navigate(
-                            Screen.AddOrEditContactLinks(alumni.uid)
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Link,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+            ManageInfoCard(
+                label = "Manage Contact Links",
+                icon = Icons.Outlined.Link,
+                onClick = {
+                    navController.navigate(
+                        Screen.AddOrEditContactLinks(alumni.uid)
                     )
-                    Text("Manage Contact Links")
                 }
-            }
+            )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                TextButton(
-                    onClick = {
-                        navController.navigate(
-                            Screen.AddOrEditExtendedInfo(alumni.uid)
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+            ManageInfoCard(
+                label = "Manage Extended Info",
+                icon = Icons.Outlined.Info,
+                onClick = {
+                    navController.navigate(
+                        Screen.AddOrEditExtendedInfo(alumni.uid)
                     )
-                    Text("Manage Extended Info")
                 }
-            }
+            )
 
             Spacer(Modifier.height(16.dp))
 
@@ -632,26 +603,13 @@ fun AdminEditAlumniProfileScreen(
         }
     }
 
-	if (showDiscardDialog) {
-		AlertDialog(
-			onDismissRequest = { showDiscardDialog = false },
-			title = { Text("Discard changes?") },
-			text = { Text("You have unsaved changes.") },
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showDiscardDialog = false
-						navController.popBackStack()
-					}
-				) {
-					Text("Discard")
-				}
+    if (showDiscardDialog) {
+		DiscardChangesDialog(
+			onDiscard = {
+				showDiscardDialog = false
+				navController.popBackStack()
 			},
-			dismissButton = {
-				TextButton(onClick = { showDiscardDialog = false }) {
-					Text("Keep Editing")
-				}
-			}
+			onDismiss = { showDiscardDialog = false }
 		)
 	}
 
@@ -682,40 +640,4 @@ fun AdminEditAlumniProfileScreen(
 			}
 		)
 	}
-    if (showDiscardDialog) {
-        AlertDialog(
-            onDismissRequest = { showDiscardDialog = false },
-            title = { Text("Discard changes?") },
-            text = { Text("You have unsaved changes.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDiscardDialog = false
-                        navController.popBackStack()
-                    }
-                ) {
-                    Text("Discard")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDiscardDialog = false }) {
-                    Text("Keep Editing")
-                }
-            }
-        )
-    }
-}
-
-private fun openUrl(context: Context, rawUrl: String) {
-    if (rawUrl.isBlank()) return
-    val url = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
-    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-    context.startActivity(intent)
-}
-
-private fun dialPhone(context: Context, phone: String) {
-    if (phone.isBlank()) return
-    val cleaned = phone.replace(" ", "")
-    val intent = Intent(Intent.ACTION_DIAL, "tel:$cleaned".toUri())
-    context.startActivity(intent)
 }

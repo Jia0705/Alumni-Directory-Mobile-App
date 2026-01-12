@@ -1,12 +1,9 @@
 package com.team.ian.ui.screens.profile
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +31,6 @@ import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,39 +38,34 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import android.content.Intent
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.graphics.Color
-import androidx.core.net.toUri
 import com.team.ian.ui.components.ProfileSection
-import com.team.ian.service.AuthService
 import com.team.ian.ui.navigation.Screen
-import com.team.ian.data.repo.AlumniRepo
 import com.team.ian.ui.components.Avatar
+import com.team.ian.ui.components.ExtendedInfoSection
 import com.team.ian.ui.components.InfoRow
+import com.team.ian.ui.screens.utils.dialPhone
+import com.team.ian.ui.screens.utils.openEmail
+import com.team.ian.ui.screens.utils.openUrl
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
-    alumniRepo: AlumniRepo = AlumniRepo.getInstance()
+    navController: NavController
 ) {
-    val authService = AuthService.getInstance()
     val context = LocalContext.current
-    val user = authService.user.collectAsStateWithLifecycle().value
-
-    val viewModel: ProfileViewModel = viewModel()
+    val viewModel: ProfileViewModel = hiltViewModel()
+    val user = viewModel.user.collectAsStateWithLifecycle().value
     val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
     val extendedInfo = viewModel.extendedInfo.collectAsStateWithLifecycle().value
     val contactLinks = viewModel.contactLinks.collectAsStateWithLifecycle().value
@@ -88,14 +79,8 @@ fun ProfileScreen(
         "yellow" to Color.Yellow
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.loadAlumniProfile()
-        viewModel.getExtendedInfo()
-        viewModel.getContactLinks()
-    }
-
     fun signOut() {
-        authService.signOut()
+        viewModel.signOut()
         navController.navigate(Screen.Splash) {
             popUpTo(Screen.Splash) { inclusive = true }
             launchSingleTop = true
@@ -224,61 +209,12 @@ fun ProfileScreen(
 
                 ProfileSection(title = "Extended Information", icon = Icons.Filled.Person) {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = "Short Bio",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ExtendedInfoSection(
+                            shortBio = extendedInfo.shortBio,
+                            skills = extendedInfo.skills,
+                            pastJobHistory = extendedInfo.pastJobHistory,
+                            showEmptyText = true
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = extendedInfo.shortBio.ifBlank { "No bio added yet" },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (extendedInfo.shortBio.isBlank())
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            else
-                                MaterialTheme.colorScheme.onSurface
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(
-                            text = "Skills",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        val skills = extendedInfo.skills.filter { it.isNotBlank() }
-                        if (skills.isEmpty()) {
-                            Text(
-                                text = "No skills added yet",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                        } else {
-                            SkillsChipRow(skills = skills)
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        Text(
-                            text = "Work Experience",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        val jobs = extendedInfo.pastJobHistory.filter { it.isNotBlank() }
-                        if (jobs.isEmpty()) {
-                            Text(
-                                text = "No work experience added yet",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                        } else {
-                            JobHistoryChips(jobs = jobs)
-                        }
                     }
                 }
 
@@ -373,88 +309,4 @@ fun ProfileScreen(
             }
         )
     }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun SkillsChipRow(skills: List<String>) {
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        skills.forEach { skill ->
-            SkillChip(text = skill)
-        }
-    }
-}
-
-@Composable
-private fun SkillChip(text: String) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun JobHistoryChips(jobs: List<String>) {
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        jobs.forEach { job ->
-            JobChip(text = job)
-        }
-    }
-}
-
-@Composable
-private fun JobChip(text: String) {
-	Card(
-        colors = androidx.compose.material3.CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-        ),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        )
-	}
-}
-
-private fun openEmail(context: Context, email: String) {
-	if (email.isBlank()) return
-	val intent = Intent(Intent.ACTION_SENDTO).apply {
-		data = "mailto:$email".toUri()
-	}
-	context.startActivity(intent)
-}
-
-private fun openUrl(context: Context, rawUrl: String) {
-	if (rawUrl.isBlank()) return
-	val url = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
-	val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-	context.startActivity(intent)
-}
-
-private fun dialPhone(context: Context, phone: String) {
-	if (phone.isBlank()) return
-	val cleaned = phone.replace(" ", "")
-	val intent = Intent(Intent.ACTION_DIAL, "tel:$cleaned".toUri())
-	context.startActivity(intent)
 }

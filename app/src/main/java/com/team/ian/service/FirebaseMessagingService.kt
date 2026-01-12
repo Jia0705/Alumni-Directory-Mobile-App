@@ -12,11 +12,16 @@ import com.google.firebase.messaging.RemoteMessage
 import com.team.ian.MainActivity
 import com.team.ian.R
 import com.team.ian.data.repo.AlumniRepo
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class IanFirebaseMessagingService: FirebaseMessagingService() {
+	@Inject lateinit var authService: AuthService
+	@Inject lateinit var alumniRepo: AlumniRepo
 
 	override fun onNewToken(token: String) {
 		super.onNewToken(token)
@@ -25,10 +30,10 @@ class IanFirebaseMessagingService: FirebaseMessagingService() {
 		// Save new token to Realtime Database
 		CoroutineScope(Dispatchers.IO).launch {
 			try {
-				val currentUser = AuthService.getInstance().getCurrentUser()
+				val currentUser = authService.getCurrentUser()
 				if (currentUser != null) {
 					val updates = mapOf("token" to token)
-					AlumniRepo.getInstance().updateProfile(currentUser.id, updates)
+					alumniRepo.updateProfile(currentUser.id, updates)
 					Log.d("token", "Token saved to Realtime Database")
 				}
 			} catch (e: Exception) {

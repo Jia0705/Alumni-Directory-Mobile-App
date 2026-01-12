@@ -23,15 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 @Composable
 fun SettingsScreen(
 	navController: NavController
 ) {
-	val viewModel: SettingsViewModel = viewModel()
+	val viewModel: SettingsViewModel = hiltViewModel()
 	val alumni = viewModel.alumni.collectAsStateWithLifecycle().value
 	val showEmail = remember(alumni.showEmail) { mutableStateOf(alumni.showEmail) }
 	val showPhone = remember(alumni.showPhone) { mutableStateOf(alumni.showPhone) }

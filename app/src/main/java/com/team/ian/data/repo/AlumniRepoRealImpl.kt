@@ -1,6 +1,5 @@
 package com.team.ian.data.repo
 
-import android.net.Uri
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,8 +14,11 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AlumniRepoRealImpl : AlumniRepo {
+@Singleton
+class AlumniRepoRealImpl @Inject constructor() : AlumniRepo {
     private val dbRefAlumni = FirebaseDatabase.getInstance().getReference("users")
     private val dbRefExtended = FirebaseDatabase.getInstance().getReference("extendedInfo")
     private val dbRefContactLinks = FirebaseDatabase.getInstance().getReference("contactLinks")
@@ -40,7 +42,7 @@ class AlumniRepoRealImpl : AlumniRepo {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = snapshot.children
-                    .mapNotNull { it.getValue(Alumni::class.java) }
+                    .mapNotNull { snapshotToAlumni(it) }
                 trySend(list)
             }
 
@@ -56,7 +58,7 @@ class AlumniRepoRealImpl : AlumniRepo {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = snapshot.children
-                    .mapNotNull { it.getValue(Alumni::class.java) }
+                    .mapNotNull { snapshotToAlumni(it) }
                     .filter { it.status != AccountStatus.PENDING && it.role != Role.ADMIN }
                 trySend(list)
             }
@@ -74,7 +76,7 @@ class AlumniRepoRealImpl : AlumniRepo {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = snapshot.children
-                    .mapNotNull { it.getValue(Alumni::class.java) }
+                    .mapNotNull { snapshotToAlumni(it) }
                     .filter { it.status == AccountStatus.APPROVED }
 
                 trySend(list)
@@ -94,7 +96,7 @@ class AlumniRepoRealImpl : AlumniRepo {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = snapshot.children
-                    .mapNotNull { it.getValue(Alumni::class.java) }
+                    .mapNotNull { snapshotToAlumni(it) }
                     .filter { it.status == AccountStatus.PENDING }
 
                 trySend(list)
@@ -113,7 +115,7 @@ class AlumniRepoRealImpl : AlumniRepo {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = snapshot.children
-                    .mapNotNull { it.getValue(Alumni::class.java) }
+                    .mapNotNull { snapshotToAlumni(it) }
                     .filter { it.status == AccountStatus.INACTIVE }
 
                 trySend(list)
@@ -132,7 +134,7 @@ class AlumniRepoRealImpl : AlumniRepo {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = snapshot.children
-                    .mapNotNull { it.getValue(Alumni::class.java) }
+                    .mapNotNull { snapshotToAlumni(it) }
                     .filter { it.status == AccountStatus.REJECTED }
 
                 trySend(list)
@@ -188,14 +190,6 @@ class AlumniRepoRealImpl : AlumniRepo {
         dbRefExtended.child(extendedInfo.uid).setValue(extendedInfo).await()
     }
 
-    // TODO: for reference, delete later
-//	override suspend fun getAlumniByUid(uid: String): Alumni? {
-//		return dbRef.child(uid)
-//			.get()
-//			.await()
-//			.getValue(Alumni::class.java)
-//	}
-
     override suspend fun getExtendedInfo(uid: String): ExtendedInfo? {
         val result = dbRefExtended.child(uid)
             .get()
@@ -221,14 +215,16 @@ class AlumniRepoRealImpl : AlumniRepo {
         return result
     }
 
-    // TODO: probably remove
-    override suspend fun uploadProfilePhoto(uid: String, imageUri: Uri) {
-        Log.d("debugging", "uploadProfilePhoto trigger?")
-//		val fileName = "profile_${uid}_${UUID.randomUUID()}.jpg"
-//		val storageRef = dbRefExtended.ref
-//		val imageRef = storageRef.child("profile_photos/$uid/$fileName")
-
-//		imageRef.putFile
+    private fun snapshotToAlumni(snapshot: DataSnapshot): Alumni? {
+        val value = snapshot.value
+        if (value !is Map<*, *>) {
+            return null
+        }
+        return try {
+            snapshot.getValue(Alumni::class.java)
+        } catch (e: Exception) {
+            Log.d("debugging", "Skipping invalid alumni snapshot: ${e.message}")
+            null
+        }
     }
 }
-
