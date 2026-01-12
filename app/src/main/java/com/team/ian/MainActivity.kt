@@ -1,7 +1,7 @@
 package com.team.ian
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import com.team.ian.ui.navigation.AppNav
-import com.team.ian.ui.theme.IANTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,10 +35,10 @@ class MainActivity : ComponentActivity() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 			if (ActivityCompat.checkSelfPermission(
 					this,
-					Manifest.permission.POST_NOTIFICATIONS
-				) != PackageManager.PERMISSION_GRANTED
+					POST_NOTIFICATIONS
+				) != PERMISSION_GRANTED
 			) {
-				notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+				notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
 			}
 		}
 	}

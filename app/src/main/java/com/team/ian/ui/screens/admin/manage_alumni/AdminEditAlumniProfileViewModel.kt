@@ -86,11 +86,11 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
     fun resetAllStates() {
         getAlumniById()
     }
+
 	fun updateAlumniRole(updatedRole: Role) {
 		val current = _alumni.value
 		_alumni.value = current.copy(role = updatedRole)
 	}
-
 
     fun finishEditing() {
         val updatedAlumni = _alumni.value
@@ -141,7 +141,7 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
                     _extendedInfo.value = it
                     Log.d("debugging",_extendedInfo.value.toString())
                 }
-            }catch (e: Exception){
+            } catch (e: Exception){
                 Log.d("debugging",e.toString())
             }
         }
@@ -154,7 +154,7 @@ class AdminEditAlumniProfileViewModel @Inject constructor(
                     _contactLinks.value = it
                     Log.d("debugging",_contactLinks.value.toString())
                 }
-            }catch (e: Exception){
+            } catch (e: Exception){
                 Log.d("debugging",e.toString())
             }
         }

@@ -35,7 +35,6 @@ class ProfileViewModel @Inject constructor(
         getExtendedInfo()
     }
 
-
 	fun loadAlumniProfile() {
 		viewModelScope.launch(Dispatchers.IO) {
 			try {
@@ -62,7 +61,7 @@ class ProfileViewModel @Inject constructor(
                         shortBio = _alumni.value.shortBio
                     )
                 }
-            }catch (e: Exception){
+            } catch (e: Exception){
                 Log.d("debugging",e.toString())
             }
         }
@@ -80,7 +79,7 @@ class ProfileViewModel @Inject constructor(
                         phoneNumber = _alumni.value.phone
                     )
                 }
-            }catch (e: Exception){
+            } catch (e: Exception){
                 Log.d("debugging",e.toString())
             }
         }

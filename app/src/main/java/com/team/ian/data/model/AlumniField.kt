@@ -13,8 +13,5 @@ enum class AlumniField {
 	COUNTRY,
 	LINKEDIN,
 	GITHUB,
-	PHONE,
-	SHORT_BIO,
-	SKILLS,
-	PAST_JOB_HISTORY
+	PHONE
 }
